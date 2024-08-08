@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ImageProcessorService {
@@ -28,14 +26,15 @@ public class ImageProcessorService {
 
     private final FileUtil fileUtil;
     private final ImageCompressor imageCompressor;
+    private final StatisticsService statisticsService;
 
-    public ImageProcessorService(FileUtil fileUtil, ImageCompressor imageCompressor) {
+    public ImageProcessorService(FileUtil fileUtil, ImageCompressor imageCompressor, StatisticsService statisticsService) {
         this.fileUtil = fileUtil;
         this.imageCompressor = imageCompressor;
+        this.statisticsService = statisticsService;
     }
 
-    @Async
-    public CompletableFuture<ResponseEntity<CompressedImageResponse>> uploadAndCompressImage(MultipartFile file, Integer quality) {
+    public ResponseEntity<CompressedImageResponse> processImage(MultipartFile file, Integer quality) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File must not be empty");
         }
@@ -47,6 +46,7 @@ public class ImageProcessorService {
 
         try {
             Path uploadedFilePath = fileUtil.saveUploadedFile(file);
+            logger.info("Uploaded file: {}", uploadedFilePath);
             Path compressedFilePath = imageCompressor.compressImage(uploadedFilePath, quality, "." + extension.toLowerCase());
 
             long originalSize = file.getSize();
@@ -63,7 +63,14 @@ public class ImageProcessorService {
 
             CompressedImageResponse response = new CompressedImageResponse(compressedImageData, file.getOriginalFilename(), originalSize, compressedSize, compressionRatio);
 
-            return CompletableFuture.completedFuture(ResponseEntity.ok().headers(headers).contentLength(compressedImageData.length).contentType(MediaType.APPLICATION_OCTET_STREAM).body(response));
+            cleanFiles(uploadedFilePath, compressedFilePath);
+
+            statisticsService.updateStatistic(compressedSize, originalSize);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
 
         } catch (IOException e) {
             logger.error("Error processing image: {}", e.getMessage());
@@ -78,5 +85,15 @@ public class ImageProcessorService {
             }
         }
         return false;
+    }
+
+    private void cleanFiles(Path uploadedFilePath, Path compressedFilePath) {
+        try {
+            Files.deleteIfExists(uploadedFilePath);
+            Files.deleteIfExists(compressedFilePath);
+            logger.info("Deleted files: {}, {}", uploadedFilePath, compressedFilePath);
+        } catch (IOException e) {
+            logger.error("Error deleting files: {}", e.getMessage());
+        }
     }
 }

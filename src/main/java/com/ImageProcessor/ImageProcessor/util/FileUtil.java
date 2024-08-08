@@ -16,7 +16,7 @@ public class FileUtil {
     private String uploadDir;
 
     @Value("${app.compressed.dir}")
-    public static String COMPRESSED_DIR;
+    private String COMPRESSED_DIR;
 
     public static final String PNG_EXTENSION = ".png";
     public static final String JPG_EXTENSION = ".jpg";
@@ -29,7 +29,7 @@ public class FileUtil {
         return filePath;
     }
 
-    public static Path createCompressedDirectory() throws IOException {
+    public Path createCompressedDirectory() throws IOException {
         return Files.createDirectories(Paths.get(COMPRESSED_DIR));
     }
 }
