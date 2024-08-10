@@ -65,7 +65,7 @@ public class ImageProcessorService {
 
             cleanFiles(uploadedFilePath, compressedFilePath);
 
-            statisticsService.updateStatistic(compressedSize, originalSize);
+            statisticsService.updateCounterStatistic(compressedSize, originalSize);
 
             return ResponseEntity.ok()
                     .headers(headers)

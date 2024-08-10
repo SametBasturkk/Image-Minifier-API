@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
 @RestController
 @RequestMapping("/api/images")
 @Validated
@@ -34,7 +31,7 @@ public class ImageProcessorController {
     @ApiResponse(responseCode = "415", description = "Unsupported media type")
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CompressedImageResponse> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("quality") @Min(0) @Max(100) Integer quality) throws IOException, ExecutionException, InterruptedException {
+    public ResponseEntity<CompressedImageResponse> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("quality") @Min(0) @Max(100) Integer quality) {
         return imageProcessorService.processImage(file, quality);
     }
 }

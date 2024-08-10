@@ -18,7 +18,7 @@ public class StatisticsService {
         this.statisticsRepository = statisticsRepository;
     }
 
-    public void updateStatistic(Long compressedSize, Long originalSize) {
+    public void updateCounterStatistic(Long compressedSize, Long originalSize) {
         lock.lock();
         try {
             Optional<Statistics> statistics = statisticsRepository.findById(1);
