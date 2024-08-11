@@ -51,10 +51,8 @@ public class ImageProcessorService {
         }
 
         try {
-            Path uploadedFilePath = fileUtil.saveUploadedFile(file);
-            logger.info("Uploaded file: {}", uploadedFilePath);
-            UUID compressedFilePathUUID = kafkaPublisherService.publishCompressImageTopic(uploadedFilePath, quality, "." + extension.toLowerCase());
-            ImageStatus imageStatus = new ImageStatus(compressedFilePathUUID, false);
+            UUID compressedFilePathUUID = kafkaPublisherService.publishCompressImageTopic(file, quality, "." + extension.toLowerCase());
+            ImageStatus imageStatus = new ImageStatus(compressedFilePathUUID, false, null);
             imageStatusRepository.save(imageStatus);
 
             while (imageStatusRepository.findByUuid(compressedFilePathUUID).isCompressed()) {
@@ -77,7 +75,6 @@ public class ImageProcessorService {
 
             CompressedImageResponse response = new CompressedImageResponse(compressedImageData, file.getOriginalFilename(), originalSize, compressedSize, compressionRatio);
 
-            cleanFiles(uploadedFilePath, compressedFilePath);
 
             statisticsService.updateCounterStatistic(compressedSize, originalSize);
 
@@ -103,13 +100,4 @@ public class ImageProcessorService {
         return false;
     }
 
-    private void cleanFiles(Path uploadedFilePath, Path compressedFilePath) {
-        try {
-            Files.deleteIfExists(uploadedFilePath);
-            Files.deleteIfExists(compressedFilePath);
-            logger.info("Deleted files: {}, {}", uploadedFilePath, compressedFilePath);
-        } catch (IOException e) {
-            logger.error("Error deleting files: {}", e.getMessage());
-        }
-    }
 }

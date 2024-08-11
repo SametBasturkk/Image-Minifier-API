@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.ImageProcessor.util")
+@ComponentScan(basePackages = "com.ImageProcessor.util, com.kafka.producer")
 public class KafkaImageProducerApplication {
     public static void main(String[] args) {
         SpringApplication.run(KafkaImageProducerApplication.class, args);

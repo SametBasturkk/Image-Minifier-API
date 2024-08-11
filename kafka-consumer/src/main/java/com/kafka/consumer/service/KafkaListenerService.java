@@ -22,6 +22,7 @@ public class KafkaListenerService {
     public void consume(CompressImageTopicModel message) {
         ImageStatus resp = imageStatusRepository.findByUuid(message.getUuid());
         resp.setCompressed(true);
+        resp.setCompressedBase64Data(message.getCompressedBase64Data());
         imageStatusRepository.save(resp);
     }
 }

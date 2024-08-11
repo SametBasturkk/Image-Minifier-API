@@ -2,7 +2,6 @@ package com.image.minifier.service;
 
 import com.image.minifier.model.Statistics;
 import com.image.minifier.repository.StatisticsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,11 +12,13 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 public class StatisticsService {
 
-    @Autowired
     private StatisticsRepository statisticsRepository;
 
     private final Lock lock = new ReentrantLock();
 
+    public StatisticsService(StatisticsRepository statisticsRepository) {
+        this.statisticsRepository = statisticsRepository;
+    }
 
 
     public void updateCounterStatistic(Long compressedSize, Long originalSize) {

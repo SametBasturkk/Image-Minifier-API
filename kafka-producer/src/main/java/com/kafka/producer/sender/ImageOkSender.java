@@ -1,12 +1,15 @@
 package com.kafka.producer.sender;
 
 import com.ImageProcessor.model.CompressImageTopicModel;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+
+import static com.kafka.producer.compression.ImageCompressorService.logger;
 
 @Service
 public class ImageOkSender {
@@ -17,12 +20,27 @@ public class ImageOkSender {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    @Value("${spring.kafka.producer.topic}")
-    private String topicName;
 
-    public void sendImageOk(Path inputFile, Integer quality, String extension, UUID uuid) {
-        CompressImageTopicModel compressImageTopicModel = new CompressImageTopicModel(inputFile, quality, extension, uuid);
+    private String topicName = "compress-image-topic-resp";
+
+    public void sendImageOk(CompressImageTopicModel compressImageTopicModel) {
+        Path outputFile = Path.of("./compressed/" + compressImageTopicModel.getUuid() + "." + compressImageTopicModel.getExtension());
+        byte[] compressedBase64Data = outputFile.toString().getBytes();
+
+        CompressImageTopicModel compressImageTopicModel = new CompressImageTopicModel(null, quality, extension, uuid, compressedBase64Data);
         kafkaTemplate.send(topicName, compressImageTopicModel.toString());
+
+        cleanFiles(inputFile, outputFile);
+    }
+
+    private void cleanFiles(Path uploadedFilePath, Path compressedFilePath) {
+        try {
+            Files.deleteIfExists(uploadedFilePath);
+            Files.deleteIfExists(compressedFilePath);
+            logger.info("Deleted files: {}, {}", uploadedFilePath, compressedFilePath);
+        } catch (IOException e) {
+            logger.error("Error deleting files: {}", e.getMessage());
+        }
     }
 
 

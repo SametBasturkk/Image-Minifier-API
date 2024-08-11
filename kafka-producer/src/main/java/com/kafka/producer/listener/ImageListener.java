@@ -5,7 +5,6 @@ import com.kafka.producer.compression.ImageCompressorService;
 import com.kafka.producer.sender.ImageOkSender;
 import org.springframework.kafka.annotation.KafkaListener;
 
-@KafkaListener(topics = "compression-topic", groupId = "group_id")
 public class ImageListener {
 
     private ImageCompressorService imageCompressorService;
@@ -16,10 +15,10 @@ public class ImageListener {
         this.imageOkSender = imageOkSender;
     }
 
-    public void consume(CompressImageTopicModel imageInfo) {
-        imageCompressorService.compressImage(imageInfo.getInputFile(), imageInfo.getQuality(), imageInfo.getExtension());
-        imageOkSender.sendImageOk(imageInfo.getInputFile(), imageInfo.getQuality(), imageInfo.getExtension(), imageInfo.getUuid());
-
+    @KafkaListener(topics = "compression-topic")
+    public void listen(CompressImageTopicModel imageInfo) {
+        imageCompressorService.compressImage(imageInfo.getInputFile(), imageInfo.getQuality(), imageInfo.getExtension(), imageInfo.getUuid());
+        imageOkSender.sendImageOk(imageInfo);
 
     }
 }

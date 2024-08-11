@@ -17,7 +17,7 @@ import java.util.Map;
 public class KafkaProducerConfig {
 
 
-    private String kafkaAddress = "compress-image-topic-resp";
+    private String kafkaAddress = "localhost:9092";
 
     @Bean
     public ProducerFactory<String, String> producerFactory() {

@@ -5,13 +5,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ImageProcessor.util.FileUtil;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.UUID;
 
 @Service
 public class ImageCompressorService {
-    private static final Logger logger = LoggerFactory.getLogger(ImageCompressorService.class);
+    public static final Logger logger = LoggerFactory.getLogger(ImageCompressorService.class);
 
     @Value("${app.compression.pngquant}")
     private String pngquantCommand;
@@ -25,11 +27,12 @@ public class ImageCompressorService {
         this.fileUtil = fileUtil;
     }
 
-    public void compressImage(Path inputFile, Integer quality, String extension) {
+    public void compressImage(MultipartFile file, Integer quality, String extension, UUID uuid) {
         try {
+            Path inputFile = fileUtil.saveUploadedFile(file, uuid);
             logger.info("Compressing image: {}", inputFile);
             String command = extension.equals(FileUtil.PNG_EXTENSION)
-                    ? String.format(pngquantCommand, fileUtil.createCompressedDirectory().resolve(inputFile.getFileName()), quality, inputFile)
+                    ? String.format(pngquantCommand, fileUtil.createCompressedDirectory().resolve(uuid.toString()), inputFile)
                     : String.format(jpegoptimCommand, fileUtil.createCompressedDirectory(), quality, inputFile);
             executeCompressionCommand(command);
         } catch (IOException | InterruptedException e) {
