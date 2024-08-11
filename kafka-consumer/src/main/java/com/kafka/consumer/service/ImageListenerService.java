@@ -1,24 +1,25 @@
-package com.kafka.producer.listener;
+package com.kafka.consumer.service;
 
 import com.ImageProcessor.model.CompressImageTopicModel;
-import com.kafka.producer.compression.ImageCompressorService;
-import com.kafka.producer.sender.ImageOkSender;
+import com.kafka.consumer.compression.ImageCompressorService;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
 
-public class ImageListener {
+@Service
+public class ImageListenerService {
 
     private ImageCompressorService imageCompressorService;
-    private ImageOkSender imageOkSender;
+    private ImageCompressSender imageCompressSender;
 
-    public ImageListener(ImageCompressorService imageCompressorService, ImageOkSender imageOkSender) {
+    public ImageListenerService(ImageCompressorService imageCompressorService, ImageCompressSender imageCompressSender) {
         this.imageCompressorService = imageCompressorService;
-        this.imageOkSender = imageOkSender;
+        this.imageCompressSender = imageCompressSender;
     }
 
     @KafkaListener(topics = "compression-topic")
     public void listen(CompressImageTopicModel imageInfo) {
         imageCompressorService.compressImage(imageInfo.getInputFile(), imageInfo.getQuality(), imageInfo.getExtension(), imageInfo.getUuid());
-        imageOkSender.sendImageOk(imageInfo);
+        imageCompressSender.sendImageOk(imageInfo);
 
     }
 }

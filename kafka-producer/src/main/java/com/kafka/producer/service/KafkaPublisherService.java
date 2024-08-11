@@ -1,4 +1,4 @@
-package com.kafka.consumer.service;
+package com.kafka.producer.service;
 
 import com.ImageProcessor.model.CompressImageTopicModel;
 import org.springframework.kafka.core.KafkaTemplate;

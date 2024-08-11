@@ -2,12 +2,12 @@ package com.image.minifier.service;
 
 
 import com.ImageProcessor.model.ImageStatus;
+import com.ImageProcessor.service.ImageStatusService;
 import com.ImageProcessor.util.FileUtil;
 import com.image.minifier.dto.CompressedImageResponse;
 import com.image.minifier.exception.FileProcessingException;
 import com.image.minifier.exception.UnsupportedFileTypeException;
-import com.image.minifier.repository.ImageStatusRepository;
-import com.kafka.consumer.service.KafkaPublisherService;
+import com.kafka.producer.service.KafkaPublisherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,13 +31,13 @@ public class ImageProcessorService {
     private final FileUtil fileUtil;
     private final KafkaPublisherService kafkaPublisherService;
     private final StatisticsService statisticsService;
-    private final ImageStatusRepository imageStatusRepository;
+    private final ImageStatusService imageStatusService;
 
-    public ImageProcessorService(FileUtil fileUtil, KafkaPublisherService kafkaPublisherService, StatisticsService statisticsService, ImageStatusRepository imageStatusRepository) {
+    public ImageProcessorService(FileUtil fileUtil, KafkaPublisherService kafkaPublisherService, StatisticsService statisticsService, ImageStatusService imageStatusService) {
         this.fileUtil = fileUtil;
         this.kafkaPublisherService = kafkaPublisherService;
         this.statisticsService = statisticsService;
-        this.imageStatusRepository = imageStatusRepository;
+        this.imageStatusService = imageStatusService;
     }
 
     public ResponseEntity<CompressedImageResponse> processImage(MultipartFile file, Integer quality) {
@@ -52,10 +52,10 @@ public class ImageProcessorService {
 
         try {
             UUID compressedFilePathUUID = kafkaPublisherService.publishCompressImageTopic(file, quality, "." + extension.toLowerCase());
-            ImageStatus imageStatus = new ImageStatus(compressedFilePathUUID, false, null);
-            imageStatusRepository.save(imageStatus);
 
-            while (imageStatusRepository.findByUuid(compressedFilePathUUID).isCompressed()) {
+            ImageStatus imageStatus = new ImageStatus(compressedFilePathUUID, false, null);
+            imageStatusService.saveImageStatus(imageStatus);
+            while (!imageStatusService.getImageStatusByUuid(imageStatus).isCompressed()) {
                 Thread.sleep(100);
             }
 

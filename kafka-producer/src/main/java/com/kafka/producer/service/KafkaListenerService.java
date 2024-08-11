@@ -1,4 +1,4 @@
-package com.kafka.consumer.service;
+package com.kafka.producer.service;
 
 
 import com.ImageProcessor.model.CompressImageTopicModel;
@@ -6,9 +6,10 @@ import com.ImageProcessor.model.ImageStatus;
 import com.ImageProcessor.repository.ImageStatusRepository;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
 
 @EnableKafka
-@KafkaListener(topics = "compress-image-topic", groupId = "group_id")
+@Service
 public class KafkaListenerService {
 
     private ImageStatusRepository imageStatusRepository;

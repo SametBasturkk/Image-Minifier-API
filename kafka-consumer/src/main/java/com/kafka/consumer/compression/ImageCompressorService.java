@@ -1,11 +1,10 @@
-package com.kafka.producer.compression;
+package com.kafka.consumer.compression;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ImageProcessor.util.FileUtil;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,7 +26,7 @@ public class ImageCompressorService {
         this.fileUtil = fileUtil;
     }
 
-    public void compressImage(MultipartFile file, Integer quality, String extension, UUID uuid) {
+    public void compressImage(byte[] file, Integer quality, String extension, UUID uuid) {
         try {
             Path inputFile = fileUtil.saveUploadedFile(file, uuid);
             logger.info("Compressing image: {}", inputFile);

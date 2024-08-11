@@ -1,4 +1,4 @@
-package com.kafka.producer.sender;
+package com.kafka.consumer.service;
 
 import com.ImageProcessor.model.CompressImageTopicModel;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -7,16 +7,15 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
 
-import static com.kafka.producer.compression.ImageCompressorService.logger;
+import static com.kafka.consumer.compression.ImageCompressorService.logger;
 
 @Service
-public class ImageOkSender {
+public class ImageCompressSender {
 
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    public ImageOkSender(KafkaTemplate<String, String> kafkaTemplate) {
+    public ImageCompressSender(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -27,10 +26,10 @@ public class ImageOkSender {
         Path outputFile = Path.of("./compressed/" + compressImageTopicModel.getUuid() + "." + compressImageTopicModel.getExtension());
         byte[] compressedBase64Data = outputFile.toString().getBytes();
 
-        CompressImageTopicModel compressImageTopicModel = new CompressImageTopicModel(null, quality, extension, uuid, compressedBase64Data);
-        kafkaTemplate.send(topicName, compressImageTopicModel.toString());
+        CompressImageTopicModel compressImageTopicModelResp = new CompressImageTopicModel(null, compressImageTopicModel.getQuality(), compressImageTopicModel.getExtension(), compressImageTopicModel.getUuid(), compressedBase64Data);
+        kafkaTemplate.send(topicName, compressImageTopicModelResp.toString());
 
-        cleanFiles(inputFile, outputFile);
+        cleanFiles(outputFile, outputFile);
     }
 
     private void cleanFiles(Path uploadedFilePath, Path compressedFilePath) {
