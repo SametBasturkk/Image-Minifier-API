@@ -1,10 +1,10 @@
 package com.kafka.consumer.compression;
 
+import com.image.minifier.common.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.ImageProcessor.util.FileUtil;
 
 import java.io.IOException;
 import java.nio.file.Path;

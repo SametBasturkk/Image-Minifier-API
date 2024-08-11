@@ -1,6 +1,6 @@
 package com.kafka.consumer.service;
 
-import com.ImageProcessor.model.CompressImageTopicModel;
+import com.image.minifier.common.model.CompressImageTopicModel;
 import com.kafka.consumer.compression.ImageCompressorService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;

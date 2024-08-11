@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ImageProcessor</groupId>
-    <artifactId>image-minifier</artifactId>
+    <artifactId>image-minifier-main</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -28,7 +28,7 @@
             <version>3.1.0</version>
         </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -77,5 +77,5 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-    
+
 </project>
