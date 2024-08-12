@@ -11,21 +11,20 @@ import java.util.UUID;
 @Service
 public class KafkaPublisherService {
 
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate;
+    private final String topicName = "compression-topic";
 
-    public KafkaPublisherService(KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaPublisherService(KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-
-    private String topicName = "compression-topic";
-
     public UUID publishCompressImageTopic(MultipartFile inputFile, Integer quality, String extension) throws IOException {
+        if (inputFile == null || inputFile.isEmpty()) {
+            throw new IllegalArgumentException("Input file cannot be null or empty");
+        }
         UUID uuid = UUID.randomUUID();
         CompressImageTopicModel compressImageTopicModel = new CompressImageTopicModel(inputFile.getBytes(), quality, extension, uuid, null);
-        kafkaTemplate.send(topicName, compressImageTopicModel.toString());
+        kafkaTemplate.send(topicName, compressImageTopicModel);
         return uuid;
     }
-
-
 }

@@ -8,16 +8,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class ImageListenerService {
 
-    private ImageCompressorService imageCompressorService;
-    private ImageCompressSender imageCompressSender;
+    private final ImageCompressorService imageCompressorService;
+    private final ImageCompressSender imageCompressSender;
 
     public ImageListenerService(ImageCompressorService imageCompressorService, ImageCompressSender imageCompressSender) {
         this.imageCompressorService = imageCompressorService;
         this.imageCompressSender = imageCompressSender;
     }
 
-    @KafkaListener(topics = "compression-topic")
-    public void listen(CompressImageTopicModel imageInfo) {
+    @KafkaListener(topics = "compression-topic", groupId = "compression-group")
+    public void consume(CompressImageTopicModel imageInfo) {
         imageCompressorService.compressImage(imageInfo.getInputFile(), imageInfo.getQuality(), imageInfo.getExtension(), imageInfo.getUuid());
         imageCompressSender.sendImageOk(imageInfo);
 
