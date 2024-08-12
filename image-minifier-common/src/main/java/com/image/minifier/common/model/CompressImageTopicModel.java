@@ -1,11 +1,13 @@
 package com.image.minifier.common.model;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class CompressImageTopicModel {
     private byte[] inputFile;
@@ -21,5 +23,4 @@ public class CompressImageTopicModel {
         this.uuid = uuid;
         this.compressedBase64Data = compressedBase64Data;
     }
-
 }

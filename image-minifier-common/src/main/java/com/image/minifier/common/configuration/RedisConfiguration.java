@@ -1,4 +1,4 @@
-package com.pospayment.pospayment.configuration;
+package com.image.minifier.common.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +30,5 @@ public class RedisConfiguration {
         template.setHashValueSerializer(new GenericToStringSerializer<>(String.class));
         return template;
     }
-
 
 }

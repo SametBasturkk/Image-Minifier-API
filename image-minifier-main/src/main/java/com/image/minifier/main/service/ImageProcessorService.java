@@ -53,11 +53,11 @@ public class ImageProcessorService {
 
             ImageStatus imageStatus = new ImageStatus(compressedFilePathUUID, false, null);
             imageStatusService.saveImageStatus(imageStatus);
-            while (imageStatusService.getImageStatusByUuid(imageStatus).getCompressedBase64Data() == null) {
-                Thread.sleep(100);
-            }
 
-            byte[] compressedImageData = imageStatusService.getImageStatusByUuid(imageStatus).getCompressedBase64Data();
+            Thread.sleep(5000);
+
+
+            byte[] compressedImageData = imageStatusService.getImageStatusByUuid(imageStatus.getUuid()).getCompressedBase64Data();
 
             long originalSize = file.getSize();
             long compressedSize = compressedImageData.length;

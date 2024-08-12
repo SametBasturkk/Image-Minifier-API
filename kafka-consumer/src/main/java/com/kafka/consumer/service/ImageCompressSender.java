@@ -1,6 +1,7 @@
 package com.kafka.consumer.service;
 
 import com.image.minifier.common.model.CompressImageTopicModel;
+import com.image.minifier.common.util.ModelConverter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,11 @@ import static com.kafka.consumer.compression.ImageCompressorService.logger;
 public class ImageCompressSender {
 
     private KafkaTemplate<String, String> kafkaTemplate;
+    private ModelConverter modelConverter;
 
-    public ImageCompressSender(KafkaTemplate<String, String> kafkaTemplate) {
+    public ImageCompressSender(KafkaTemplate<String, String> kafkaTemplate, ModelConverter modelConverter) {
         this.kafkaTemplate = kafkaTemplate;
+        this.modelConverter = modelConverter;
     }
 
 
@@ -28,7 +31,7 @@ public class ImageCompressSender {
         byte[] compressedBase64Data = outputFile.toString().getBytes();
 
         CompressImageTopicModel compressImageTopicModelResp = new CompressImageTopicModel(null, compressImageTopicModel.getQuality(), compressImageTopicModel.getExtension(), compressImageTopicModel.getUuid(), compressedBase64Data);
-        kafkaTemplate.send(topicName, compressImageTopicModelResp.toString());
+        kafkaTemplate.send(topicName, modelConverter.mapToString(compressImageTopicModelResp));
 
         cleanFiles(compressImageTopicModel.getUuid(), outputFile);
     }
