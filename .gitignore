@@ -199,3 +199,5 @@ README.html
 .idea
 .exercism
 Image-Minifier-API.zip
+/uploads
+/compressed

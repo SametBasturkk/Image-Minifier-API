@@ -31,7 +31,7 @@ public class ImageCompressorService {
             Path inputFile = fileUtil.saveUploadedFile(file, uuid);
             logger.info("Compressing image: {}", inputFile);
             String command = extension.equals(FileUtil.PNG_EXTENSION)
-                    ? String.format(pngquantCommand, fileUtil.createCompressedDirectory().resolve(uuid.toString()), inputFile)
+                    ? String.format(pngquantCommand, fileUtil.createCompressedDirectory().resolve(uuid.toString()), quality, inputFile)
                     : String.format(jpegoptimCommand, fileUtil.createCompressedDirectory(), quality, inputFile);
             executeCompressionCommand(command);
         } catch (IOException | InterruptedException e) {
@@ -50,7 +50,7 @@ public class ImageCompressorService {
             Process process = Runtime.getRuntime().exec(shellCommand);
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-               logger.error("Error executing compression command: {}", command);
+                logger.error("Error executing compression command: {}", command);
             }
         } catch (IOException | InterruptedException e) {
             logger.error("Error executing compression command", e);

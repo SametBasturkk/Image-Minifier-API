@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 
 import static com.kafka.consumer.compression.ImageCompressorService.logger;
 
@@ -29,14 +30,14 @@ public class ImageCompressSender {
         CompressImageTopicModel compressImageTopicModelResp = new CompressImageTopicModel(null, compressImageTopicModel.getQuality(), compressImageTopicModel.getExtension(), compressImageTopicModel.getUuid(), compressedBase64Data);
         kafkaTemplate.send(topicName, compressImageTopicModelResp.toString());
 
-        cleanFiles(outputFile, outputFile);
+        cleanFiles(compressImageTopicModel.getUuid(), outputFile);
     }
 
-    private void cleanFiles(Path uploadedFilePath, Path compressedFilePath) {
+    private void cleanFiles(UUID fileName, Path compressedFilePath) {
         try {
-            Files.deleteIfExists(uploadedFilePath);
+            Files.deleteIfExists(Path.of("./uploads/" + fileName));
             Files.deleteIfExists(compressedFilePath);
-            logger.info("Deleted files: {}, {}", uploadedFilePath, compressedFilePath);
+            logger.info("Deleted files: {}, {}", fileName, compressedFilePath);
         } catch (IOException e) {
             logger.error("Error deleting files: {}", e.getMessage());
         }

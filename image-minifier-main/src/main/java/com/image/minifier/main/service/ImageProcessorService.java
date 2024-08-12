@@ -17,8 +17,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
@@ -55,19 +53,17 @@ public class ImageProcessorService {
 
             ImageStatus imageStatus = new ImageStatus(compressedFilePathUUID, false, null);
             imageStatusService.saveImageStatus(imageStatus);
-            while (imageStatusService.getImageStatusByUuid(imageStatus) == null) {
+            while (imageStatusService.getImageStatusByUuid(imageStatus).getCompressedBase64Data() == null) {
                 Thread.sleep(100);
             }
 
-            Path compressedFilePath = fileUtil.createCompressedDirectory().resolve(compressedFilePathUUID + "." + extension.toLowerCase());
+            byte[] compressedImageData = imageStatusService.getImageStatusByUuid(imageStatus).getCompressedBase64Data();
 
             long originalSize = file.getSize();
-            long compressedSize = Files.size(compressedFilePath);
+            long compressedSize = compressedImageData.length;
             float compressionRatio = ((float) (originalSize - compressedSize) / originalSize) * 100;
 
             logger.info("Original size: {}, Compressed size: {}, Compression ratio: {}%", originalSize, compressedSize, compressionRatio);
-
-            byte[] compressedImageData = Files.readAllBytes(compressedFilePath);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDisposition(ContentDisposition.attachment().filename(file.getOriginalFilename()).build());
