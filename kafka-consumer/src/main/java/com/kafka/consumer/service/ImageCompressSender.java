@@ -36,10 +36,11 @@ public class ImageCompressSender {
         cleanFiles(compressImageTopicModel.getUuid(), outputFile);
     }
 
+
     private void cleanFiles(UUID fileName, Path compressedFilePath) {
         try {
-            Files.deleteIfExists(Path.of("./uploads/" + fileName));
-            Files.deleteIfExists(Path.of("./compressed/" + fileName));
+            Files.delete(Path.of("./uploads/" + fileName));
+            Files.delete(Path.of("./compressed/" + fileName));
             logger.info("Deleted files: {}, {}", fileName, compressedFilePath);
         } catch (IOException e) {
             logger.error("Error deleting files: {}", e.getMessage());
