@@ -9,7 +9,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>kafka-producer</module>
         <module>kafka-consumer</module>
         <module>image-minifier-main</module>
         <module>image-minifier-common</module>

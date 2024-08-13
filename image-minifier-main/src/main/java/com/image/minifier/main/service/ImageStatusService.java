@@ -1,7 +1,7 @@
-package com.image.minifier.common.service;
+package com.image.minifier.main.service;
 
-import com.image.minifier.common.model.ImageStatus;
 import com.image.minifier.common.util.ModelConverter;
+import com.image.minifier.main.model.ImageStatus;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 

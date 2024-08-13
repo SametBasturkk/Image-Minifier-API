@@ -1,6 +1,6 @@
-package com.image.minifier.common.repository;
+package com.image.minifier.main.repository.repository;
 
-import com.image.minifier.common.model.ImageStatus;
+import com.image.minifier.main.model.ImageStatus;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.UUID;

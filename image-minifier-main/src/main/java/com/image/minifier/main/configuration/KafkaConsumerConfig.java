@@ -1,4 +1,4 @@
-package com.kafka.consumer.configuration;
+package com.image.minifier.main.configuration;
 
 import com.image.minifier.common.model.CompressImageTopicModel;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -49,5 +49,5 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
-
+    
 }

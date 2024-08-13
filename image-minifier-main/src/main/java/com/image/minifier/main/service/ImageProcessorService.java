@@ -1,12 +1,11 @@
 package com.image.minifier.main.service;
 
-import com.image.minifier.common.model.ImageStatus;
-import com.image.minifier.common.service.ImageStatusService;
+import com.image.minifier.main.model.ImageStatus;
 import com.image.minifier.common.util.FileUtil;
 import com.image.minifier.main.dto.CompressedImageResponse;
 import com.image.minifier.main.exception.FileProcessingException;
 import com.image.minifier.main.exception.UnsupportedFileTypeException;
-import com.kafka.producer.service.KafkaPublisherService;
+import com.image.minifier.main.producer.KafkaPublisherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

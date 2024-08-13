@@ -15,10 +15,10 @@ import static com.kafka.consumer.compression.ImageCompressorService.logger;
 @Service
 public class ImageCompressSender {
 
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate;
     private ModelConverter modelConverter;
 
-    public ImageCompressSender(KafkaTemplate<String, String> kafkaTemplate, ModelConverter modelConverter) {
+    public ImageCompressSender(KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate, ModelConverter modelConverter) {
         this.kafkaTemplate = kafkaTemplate;
         this.modelConverter = modelConverter;
     }
@@ -31,7 +31,7 @@ public class ImageCompressSender {
         byte[] compressedBase64Data = outputFile.toString().getBytes();
 
         CompressImageTopicModel compressImageTopicModelResp = new CompressImageTopicModel(null, compressImageTopicModel.getQuality(), compressImageTopicModel.getExtension(), compressImageTopicModel.getUuid(), compressedBase64Data);
-        kafkaTemplate.send(topicName, modelConverter.mapToString(compressImageTopicModelResp));
+        kafkaTemplate.send(topicName, compressImageTopicModelResp);
 
         cleanFiles(compressImageTopicModel.getUuid(), outputFile);
     }

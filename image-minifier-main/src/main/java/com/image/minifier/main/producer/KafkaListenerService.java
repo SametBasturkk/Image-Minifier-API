@@ -1,10 +1,10 @@
-package com.kafka.producer.service;
+package com.image.minifier.main.producer;
 
 
 import com.image.minifier.common.model.CompressImageTopicModel;
-import com.image.minifier.common.model.ImageStatus;
-import com.image.minifier.common.service.ImageStatusService;
 import com.image.minifier.common.util.ModelConverter;
+import com.image.minifier.main.model.ImageStatus;
+import com.image.minifier.main.service.ImageStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -25,10 +25,9 @@ public class KafkaListenerService {
     }
 
     @KafkaListener(topics = "compress-image-topic-resp", groupId = "group_id")
-    public void consume(String message) {
-        CompressImageTopicModel data = mapper.stringToMap(message, CompressImageTopicModel.class);
-        ImageStatus imageStatus = imageStatusService.getImageStatusByUuid(data.getUuid());
-        imageStatus.setCompressedBase64Data(data.getCompressedBase64Data());
+    public void consume(CompressImageTopicModel message) {
+        ImageStatus imageStatus = imageStatusService.getImageStatusByUuid(message.getUuid());
+        imageStatus.setCompressedBase64Data(message.getCompressedBase64Data());
         imageStatus.setCompressed(true);
         imageStatusService.saveImageStatus(imageStatus);
     }

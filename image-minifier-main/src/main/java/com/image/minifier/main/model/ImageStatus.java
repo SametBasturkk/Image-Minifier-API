@@ -1,4 +1,4 @@
-package com.image.minifier.common.model;
+package com.image.minifier.main.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
