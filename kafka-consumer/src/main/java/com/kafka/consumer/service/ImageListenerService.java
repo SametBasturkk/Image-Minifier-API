@@ -6,6 +6,7 @@ import com.kafka.consumer.compression.ImageCompressorService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -38,7 +39,11 @@ public class ImageListenerService {
         }, executor);
 
         compressionFuture.thenAcceptAsync(compressedImage -> {
-            imageCompressSender.sendImageOk(compressedImage);
+            try {
+                imageCompressSender.sendImageOk(compressedImage);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }, executor);
     }
 }

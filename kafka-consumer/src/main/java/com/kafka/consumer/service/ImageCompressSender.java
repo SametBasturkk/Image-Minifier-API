@@ -26,9 +26,9 @@ public class ImageCompressSender {
 
     private String topicName = "compress-image-topic-resp";
 
-    public void sendImageOk(CompressImageTopicModel compressImageTopicModel) {
-        Path outputFile = Path.of("./compressed/" + compressImageTopicModel.getUuid() + "." + compressImageTopicModel.getExtension());
-        byte[] compressedBase64Data = outputFile.toString().getBytes();
+    public void sendImageOk(CompressImageTopicModel compressImageTopicModel) throws IOException {
+        Path outputFile = Path.of("./compressed/" + compressImageTopicModel.getUuid());
+        byte[] compressedBase64Data = Files.readAllBytes(outputFile);
 
         CompressImageTopicModel compressImageTopicModelResp = new CompressImageTopicModel(null, compressImageTopicModel.getQuality(), compressImageTopicModel.getExtension(), compressImageTopicModel.getUuid(), compressedBase64Data);
         kafkaTemplate.send(topicName, compressImageTopicModelResp);

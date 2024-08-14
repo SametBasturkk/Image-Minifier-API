@@ -81,6 +81,7 @@ public class ImageProcessorService {
     private ResponseEntity<CompressedImageResponse> waitForImageCompression(ImageStatus imageStatus, MultipartFile file) {
         CompletableFuture<ResponseEntity<CompressedImageResponse>> responseFuture = new CompletableFuture<>();
 
+
         ScheduledFuture<?> scheduledFuture = executorService.scheduleAtFixedRate(() -> {
             ImageStatus status = imageStatusService.getImageStatusByUuid(imageStatus.getUuid());
             if (status.isCompressed()) {

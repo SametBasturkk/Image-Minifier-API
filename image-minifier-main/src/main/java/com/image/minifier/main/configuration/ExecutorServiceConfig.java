@@ -11,6 +11,7 @@ public class ExecutorServiceConfig {
 
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {
-        return Executors.newScheduledThreadPool(1);
+        return
+                Executors.newScheduledThreadPool(10);
     }
 }
