@@ -77,6 +77,8 @@ services:
       - "5000:5000/tcp"
       - "5000:5000/udp"
       - "9600:9600"
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     depends_on:
@@ -95,6 +97,9 @@ services:
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
       LOGGING_LEVEL_ORG_HIBERNATE: ERROR
+      LOGGING_FILE_NAME: /logs/image-minifier.log
+      LOGGING_FILE_MAX_SIZE: 10MB
+      LOGGING_FILE_MAX_HISTORY: 10
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
       SPRING_HTTP_LOG_REQUEST_DETAILS: "true"

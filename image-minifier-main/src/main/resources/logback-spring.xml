@@ -3,11 +3,14 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <springProperty scope="context" name="logstashServer" source="elk.logstash.server"/>
     <springProperty scope="context" name="logstashPort" source="elk.logstash.port"/>
+    <springProperty scope="context" name="identifier" source="app.log.identifier"/>
 
 
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>${logstashServer}:${logstashPort}</destination>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"Identifier":"${identifier}"}</customFields>
+        </encoder>
     </appender>
 
     <root level="INFO">
