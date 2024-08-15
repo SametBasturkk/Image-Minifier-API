@@ -41,8 +41,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   elasticsearch:
-    container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    container_name: elasticsearch
     environment:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - bootstrap.memory_lock=true
@@ -66,13 +66,12 @@ services:
       XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
     ports:
       - "5601:5601"
+    depends_on:
+      - elasticsearch
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.9.0
     container_name: logstash
-    volumes:
-      - /root/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - /root/logstash/pipeline:/usr/share/logstash/pipeline
     ports:
       - "5044:5044"
       - "5000:5000/tcp"
@@ -82,19 +81,6 @@ services:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     depends_on:
       - elasticsearch
-
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:8.9.0
-    container_name: filebeat
-    user: root
-    volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /root/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-    command: [ "--strict.perms=false" ]
-    depends_on:
-      - elasticsearch
-      - logstash
 
   app:
     image: sametklou1907/image-minifier-main:latest
@@ -109,9 +95,6 @@ services:
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
       LOGGING_LEVEL_ORG_HIBERNATE: ERROR
-      LOGGING_FILE_NAME: /logs/image-minifier.log
-      LOGGING_FILE_MAX_SIZE: 10MB
-      LOGGING_FILE_MAX_HISTORY: 10
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
       SPRING_HTTP_LOG_REQUEST_DETAILS: "true"
@@ -120,6 +103,9 @@ services:
       SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 10MB
       SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 10MB
       APP_SUPPORTED_EXTENSIONS: png,jpg,jpeg
+      ELK_LOGSTASH_SERVER: 185.136.206.146
+      ELK_LOGSTASH_PORT: 5000
+      ELK_ENABLE: "true"
     depends_on:
       - postgres
       - redis
