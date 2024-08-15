@@ -11,17 +11,20 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
@@ -36,6 +39,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
@@ -54,6 +58,7 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+
   kibana:
     image: docker.elastic.co/kibana/kibana:8.9.0
     container_name: kibana
@@ -61,12 +66,13 @@ services:
       XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
     ports:
       - "5601:5601"
+
   logstash:
     image: docker.elastic.co/logstash/logstash:8.9.0
     container_name: logstash
     volumes:
-      - /root/logstash/config/logstash.yml
-      - /root/logstash/pipeline
+      - /root/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - /root/logstash/pipeline:/usr/share/logstash/pipeline
     ports:
       - "5044:5044"
       - "5000:5000/tcp"
@@ -76,6 +82,7 @@ services:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     depends_on:
       - elasticsearch
+
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.9.0
     container_name: filebeat
@@ -83,10 +90,42 @@ services:
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /root/filebeat/filebeat.yml
-    command: ["--strict.perms=false"]
+      - /root/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    command: [ "--strict.perms=false" ]
     depends_on:
       - elasticsearch
       - logstash
+
+  app:
+    image: sametklou1907/image-minifier-main:latest
+    container_name: main-minifier
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_image
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: samet123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
+      LOGGING_LEVEL_ORG_HIBERNATE: ERROR
+      LOGGING_FILE_NAME: /logs/image-minifier.log
+      LOGGING_FILE_MAX_SIZE: 10MB
+      LOGGING_FILE_MAX_HISTORY: 10
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_HTTP_LOG_REQUEST_DETAILS: "true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_KAFKA_CONSUMER_GROUP_ID: group_id
+      SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 10MB
+      SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 10MB
+      APP_SUPPORTED_EXTENSIONS: png,jpg,jpeg
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    volumes:
+      - ./logs:/logs
+
 volumes:
   postgres_data:
