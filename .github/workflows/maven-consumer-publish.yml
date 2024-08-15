@@ -25,8 +25,8 @@ jobs:
         working-directory: ${{github.workspace}}
         
       - name: Build Consumer Docker image
-        run: docker build -t sametklou1907/image-mifinier-consumer:latest ./image-minifier-kafka-consumer
+        run: docker build -t sametklou1907/image-minifier-consumer:latest ./image-minifier-kafka-consumer
       - name: Push to Consumer Docker Hub
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker push sametklou1907/image-mifinier-consumer:latest
+          docker push sametklou1907/image-minifier-consumer:latest
