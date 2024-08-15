@@ -1,0 +1,32 @@
+name: Java CI with Maven and Publish on Docker for Consumer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '22'
+          cache: 'maven'
+          cache-dependency-path: './pom.xml'
+      - name: Build with Maven
+        run: mvn clean install --file pom.xml -DskipTests
+        working-directory: ${{github.workspace}}
+        
+      - name: Build Consumer Docker image
+        run: docker build -t sametklou1907/image-mifinier-consumer:latest ./image-minifier-kafka-consumer
+      - name: Push to Consumer Docker Hub
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push sametklou1907/tenantmanager:latest
