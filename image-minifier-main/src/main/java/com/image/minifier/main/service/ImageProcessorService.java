@@ -1,13 +1,12 @@
 package com.image.minifier.main.service;
 
-import com.image.minifier.main.model.ImageStatus;
 import com.image.minifier.common.util.FileUtil;
 import com.image.minifier.main.dto.CompressedImageResponse;
 import com.image.minifier.main.exception.FileProcessingException;
 import com.image.minifier.main.exception.UnsupportedFileTypeException;
+import com.image.minifier.main.model.ImageStatus;
 import com.image.minifier.main.producer.KafkaPublisherService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -19,9 +18,9 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.*;
 
+@Slf4j
 @Service
 public class ImageProcessorService {
-    private static final Logger logger = LoggerFactory.getLogger(ImageProcessorService.class);
 
     @Value("${app.supported.extensions}")
     private String[] supportedExtensions;
@@ -48,10 +47,11 @@ public class ImageProcessorService {
             UUID compressedFilePathUUID = kafkaPublisherService.publishCompressImageTopic(file, quality, "." + extension.toLowerCase());
             ImageStatus imageStatus = new ImageStatus(compressedFilePathUUID, false, null);
             imageStatusService.saveImageStatus(imageStatus);
+            log.info("Image processing started for file: {}", file.getOriginalFilename());
 
             return waitForImageCompression(imageStatus, file);
         } catch (IOException e) {
-            logger.error("Error processing image: {}", e.getMessage(), e);
+            log.error("Error processing image", e);
             throw new FileProcessingException("Error processing image", e);
         }
     }
@@ -81,11 +81,14 @@ public class ImageProcessorService {
     private ResponseEntity<CompressedImageResponse> waitForImageCompression(ImageStatus imageStatus, MultipartFile file) {
         CompletableFuture<ResponseEntity<CompressedImageResponse>> responseFuture = new CompletableFuture<>();
 
+        log.info("Waiting for image compression to complete");
+
 
         ScheduledFuture<?> scheduledFuture = executorService.scheduleAtFixedRate(() -> {
             ImageStatus status = imageStatusService.getImageStatusByUuid(imageStatus.getUuid());
             if (status.isCompressed()) {
                 completeResponseFuture(responseFuture, status, file);
+                log.info("Image compression completed for file: {}", file.getOriginalFilename());
                 Thread.currentThread().interrupt();
             }
         }, 0, 1, TimeUnit.SECONDS);
@@ -103,9 +106,9 @@ public class ImageProcessorService {
         byte[] compressedImageData = status.getCompressedBase64Data();
         long originalSize = file.getSize();
         long compressedSize = compressedImageData.length;
-        float compressionRatio = calculateCompressionRatio(originalSize, compressedSize);
+        double compressionRatio = calculateCompressionRatio(originalSize, compressedSize);
 
-        logger.info("Original size: {}, Compressed size: {}, Compression ratio: {}%", originalSize, compressedSize, compressionRatio);
+        log.info("Original size: {}, Compressed size: {}, Compression ratio: {}%", originalSize, compressedSize, compressionRatio);
 
         CompressedImageResponse response = new CompressedImageResponse(compressedImageData, file.getOriginalFilename(), originalSize, compressedSize, compressionRatio);
         statisticsService.updateCounterStatistic(compressedSize, originalSize);
@@ -113,8 +116,8 @@ public class ImageProcessorService {
         responseFuture.complete(ResponseEntity.ok().headers(createHeaders(file)).contentType(MediaType.APPLICATION_JSON).body(response));
     }
 
-    private float calculateCompressionRatio(long originalSize, long compressedSize) {
-        return ((float) (originalSize - compressedSize) / originalSize) * 100;
+    private double calculateCompressionRatio(long originalSize, long compressedSize) {
+        return ((double) (originalSize - compressedSize) / originalSize) * 100 ;
     }
 
     private HttpHeaders createHeaders(MultipartFile file) {

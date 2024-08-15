@@ -2,6 +2,7 @@ package com.image.minifier.main.service;
 
 import com.image.minifier.main.model.Statistics;
 import com.image.minifier.main.repository.StatisticsRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -9,6 +10,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
+@Slf4j
 @Service
 public class StatisticsService {
 
@@ -26,15 +28,19 @@ public class StatisticsService {
         try {
             Optional<Statistics> statistics = statisticsRepository.findById(1);
 
+            log.info("Updating statistics");
+
             if (statistics.isPresent()) {
                 Statistics stats = statistics.get();
                 stats.setTotalImagesProcessed(stats.getTotalImagesProcessed() + 1);
                 stats.setTotalBytesProcessed(stats.getTotalBytesProcessed() + originalSize);
                 stats.setTotalBytesSaved(stats.getTotalBytesSaved() + (originalSize - compressedSize));
                 statisticsRepository.save(stats);
+                log.info("Statistics updated");
             } else {
                 Statistics stats = new Statistics(1, originalSize - compressedSize, originalSize);
                 statisticsRepository.save(stats);
+                log.info("Statistics created");
             }
         } finally {
             lock.unlock();

@@ -8,9 +8,9 @@ public class CompressedImageResponse {
     private String filename;
     private long originalSize;
     private long compressedSize;
-    private float compressionRatio;
+    private double compressionRatio;
 
-    public CompressedImageResponse(byte[] compressedImage, String filename, long originalSize, long compressedSize, float compressionRatio) {
+    public CompressedImageResponse(byte[] compressedImage, String filename, long originalSize, long compressedSize, double compressionRatio) {
         this.compressedImage = compressedImage;
         this.filename = filename;
         this.originalSize = originalSize;

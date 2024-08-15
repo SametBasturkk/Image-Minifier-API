@@ -2,6 +2,7 @@ package com.kafka.consumer.service;
 
 import com.image.minifier.common.model.CompressImageTopicModel;
 import com.image.minifier.common.util.ModelConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import static com.kafka.consumer.compression.ImageCompressorService.logger;
 
+@Slf4j
 @Service
 public class ImageCompressSender {
 
@@ -32,6 +33,7 @@ public class ImageCompressSender {
 
         CompressImageTopicModel compressImageTopicModelResp = new CompressImageTopicModel(null, compressImageTopicModel.getQuality(), compressImageTopicModel.getExtension(), compressImageTopicModel.getUuid(), compressedBase64Data);
         kafkaTemplate.send(topicName, compressImageTopicModelResp);
+        log.info("Published message: {}", compressImageTopicModelResp);
 
         cleanFiles(compressImageTopicModel.getUuid(), outputFile);
     }
@@ -41,9 +43,9 @@ public class ImageCompressSender {
         try {
             Files.delete(Path.of("./uploads/" + fileName));
             Files.delete(Path.of("./compressed/" + fileName));
-            logger.info("Deleted files: {}, {}", fileName, compressedFilePath);
+            log.info("Deleted files: {}, {}", fileName, compressedFilePath);
         } catch (IOException e) {
-            logger.error("Error deleting files: {}", e.getMessage());
+            log.error("Error deleting files: {}", e.getMessage());
         }
     }
 

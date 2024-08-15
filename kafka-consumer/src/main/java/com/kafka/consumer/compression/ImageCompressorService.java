@@ -1,8 +1,7 @@
 package com.kafka.consumer.compression;
 
 import com.image.minifier.common.util.FileUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -11,8 +10,8 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class ImageCompressorService {
-    public static final Logger logger = LoggerFactory.getLogger(ImageCompressorService.class);
 
     @Value("${app.compression.pngquant}")
     private String pngquantCommand;
@@ -29,18 +28,18 @@ public class ImageCompressorService {
     public void compressImage(byte[] file, Integer quality, String extension, UUID uuid) {
         try {
             Path inputFile = fileUtil.saveUploadedFile(file, uuid);
-            logger.info("Compressing image: {}", inputFile);
+            log.info("Compressing image: {}", inputFile);
             String command = extension.equals(FileUtil.PNG_EXTENSION)
                     ? String.format(pngquantCommand, fileUtil.createCompressedDirectory().resolve(uuid.toString()), quality, inputFile)
                     : String.format(jpegoptimCommand, fileUtil.createCompressedDirectory(), quality, inputFile);
             executeCompressionCommand(command);
         } catch (IOException | InterruptedException e) {
-            logger.error("Error compressing image", e);
+            log.error("Error compressing image", e);
         }
     }
 
     private void executeCompressionCommand(String command) throws IOException, InterruptedException {
-        logger.info("Compression command: {}", command);
+        log.info("Compression command: {}", command);
 
         String[] shellCommand = System.getProperty("os.name").toLowerCase().contains("win")
                 ? new String[]{"cmd", "/c", command}
@@ -50,10 +49,10 @@ public class ImageCompressorService {
             Process process = Runtime.getRuntime().exec(shellCommand);
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                logger.error("Error executing compression command: {}", command);
+                log.error("Error executing compression command: {}", command);
             }
         } catch (IOException | InterruptedException e) {
-            logger.error("Error executing compression command", e);
+            log.error("Error executing compression command", e);
         }
     }
 }
