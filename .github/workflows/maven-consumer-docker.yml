@@ -1,4 +1,4 @@
-name: Java CI with Maven and Publish on Docker for Main
+name: Java CI with Maven and Publish on Docker for Consumer
 
 on:
   workflow_dispatch:
