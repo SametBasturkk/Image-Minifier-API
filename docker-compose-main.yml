@@ -111,6 +111,7 @@ services:
       ELK_LOGSTASH_SERVER: 185.136.206.146
       ELK_LOGSTASH_PORT: 5000
       ELK_ENABLE: "true"
+      APP_LOG_IDENTIFIER: image-minifier-main
     depends_on:
       - postgres
       - redis
