@@ -1,6 +1,5 @@
 package com.image.minifier.main.service;
 
-import com.image.minifier.common.util.FileUtil;
 import com.image.minifier.main.dto.CompressedImageResponse;
 import com.image.minifier.main.exception.FileProcessingException;
 import com.image.minifier.main.exception.UnsupportedFileTypeException;
@@ -25,14 +24,12 @@ public class ImageProcessorService {
     @Value("${app.supported.extensions}")
     private String[] supportedExtensions;
 
-    private final FileUtil fileUtil;
     private final KafkaPublisherService kafkaPublisherService;
     private final StatisticsService statisticsService;
     private final ImageStatusService imageStatusService;
     private final ScheduledExecutorService executorService;
 
-    public ImageProcessorService(FileUtil fileUtil, KafkaPublisherService kafkaPublisherService, StatisticsService statisticsService, ImageStatusService imageStatusService, ScheduledExecutorService executorService) {
-        this.fileUtil = fileUtil;
+    public ImageProcessorService(KafkaPublisherService kafkaPublisherService, StatisticsService statisticsService, ImageStatusService imageStatusService, ScheduledExecutorService executorService) {
         this.kafkaPublisherService = kafkaPublisherService;
         this.statisticsService = statisticsService;
         this.imageStatusService = imageStatusService;

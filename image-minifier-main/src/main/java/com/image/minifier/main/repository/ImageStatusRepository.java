@@ -1,4 +1,4 @@
-package com.image.minifier.main.repository.repository;
+package com.image.minifier.main.repository;
 
 import com.image.minifier.main.model.ImageStatus;
 import org.springframework.data.repository.CrudRepository;

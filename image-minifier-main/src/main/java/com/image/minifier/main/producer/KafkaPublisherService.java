@@ -1,7 +1,6 @@
 package com.image.minifier.main.producer;
 
 import com.image.minifier.common.model.CompressImageTopicModel;
-import com.image.minifier.common.util.ModelConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -15,12 +14,11 @@ import java.util.UUID;
 public class KafkaPublisherService {
 
     private final KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate;
-    private ModelConverter modelConverter;
+
     private final String topicName = "compression-topic";
 
-    public KafkaPublisherService(KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate, ModelConverter modelConverter) {
+    public KafkaPublisherService(KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
-        this.modelConverter = modelConverter;
     }
 
     public UUID publishCompressImageTopic(MultipartFile inputFile, Integer quality, String extension) throws IOException {

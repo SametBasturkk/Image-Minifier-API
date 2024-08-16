@@ -2,7 +2,7 @@ package com.image.minifier.main.producer;
 
 
 import com.image.minifier.common.model.CompressImageTopicModel;
-import com.image.minifier.common.util.ModelConverter;
+import com.image.minifier.common.util.ObjectConverter;
 import com.image.minifier.main.model.ImageStatus;
 import com.image.minifier.main.service.ImageStatusService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ public class KafkaListenerService {
     private ImageStatusService imageStatusService;
 
     @Autowired
-    private ModelConverter mapper;
+    private ObjectConverter mapper;
 
 
     public KafkaListenerService(ImageStatusService imageStatusService) {

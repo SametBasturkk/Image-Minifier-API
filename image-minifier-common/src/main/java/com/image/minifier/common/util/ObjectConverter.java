@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ModelConverter {
+public class ObjectConverter {
     private ObjectMapper objectMapper;
 
-    public ModelConverter() {
+    public ObjectConverter() {
         objectMapper = new ObjectMapper();
     }
 

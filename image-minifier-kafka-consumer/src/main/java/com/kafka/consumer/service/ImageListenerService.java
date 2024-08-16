@@ -1,7 +1,6 @@
 package com.kafka.consumer.service;
 
 import com.image.minifier.common.model.CompressImageTopicModel;
-import com.image.minifier.common.util.ModelConverter;
 import com.kafka.consumer.compression.ImageCompressorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -17,14 +16,12 @@ public class ImageListenerService {
 
     private final ImageCompressorService imageCompressorService;
     private final ImageCompressSender imageCompressSender;
-    private final ModelConverter modelMapper;
     private final Executor executor;
 
 
-    public ImageListenerService(ImageCompressorService imageCompressorService, ImageCompressSender imageCompressSender, ModelConverter modelMapper, Executor executor) {
+    public ImageListenerService(ImageCompressorService imageCompressorService, ImageCompressSender imageCompressSender, Executor executor) {
         this.imageCompressorService = imageCompressorService;
         this.imageCompressSender = imageCompressSender;
-        this.modelMapper = modelMapper;
         this.executor = executor;
     }
 

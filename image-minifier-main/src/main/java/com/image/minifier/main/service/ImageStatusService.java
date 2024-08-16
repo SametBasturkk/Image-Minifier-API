@@ -1,6 +1,6 @@
 package com.image.minifier.main.service;
 
-import com.image.minifier.common.util.ModelConverter;
+import com.image.minifier.common.util.ObjectConverter;
 import com.image.minifier.main.model.ImageStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -15,9 +15,9 @@ public class ImageStatusService {
     private StringRedisTemplate redisTemplate;
 
 
-    private ModelConverter mapper;
+    private ObjectConverter mapper;
 
-    public ImageStatusService(StringRedisTemplate redisTemplate, ModelConverter mapper) {
+    public ImageStatusService(StringRedisTemplate redisTemplate, ObjectConverter mapper) {
         this.redisTemplate = redisTemplate;
         this.mapper = mapper;
     }

@@ -1,7 +1,8 @@
 package com.kafka.consumer.service;
 
 import com.image.minifier.common.model.CompressImageTopicModel;
-import com.image.minifier.common.util.ModelConverter;
+import com.image.minifier.common.util.FileUtil;
+import com.image.minifier.common.util.ObjectConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -17,11 +18,11 @@ import java.util.UUID;
 public class ImageCompressSender {
 
     private KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate;
-    private ModelConverter modelConverter;
+    private ObjectConverter objectConverter;
 
-    public ImageCompressSender(KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate, ModelConverter modelConverter) {
+    public ImageCompressSender(KafkaTemplate<String, CompressImageTopicModel> kafkaTemplate, ObjectConverter objectConverter) {
         this.kafkaTemplate = kafkaTemplate;
-        this.modelConverter = modelConverter;
+        this.objectConverter = objectConverter;
     }
 
 
@@ -41,8 +42,8 @@ public class ImageCompressSender {
 
     private void cleanFiles(UUID fileName, Path compressedFilePath) {
         try {
-            Files.delete(Path.of("./uploads/" + fileName));
-            Files.delete(Path.of("./compressed/" + fileName));
+            Files.delete(Path.of(FileUtil.COMPRESSED_DIR + fileName));
+            Files.delete(Path.of(FileUtil.UPLOAD_DIR + fileName));
             log.info("Deleted files: {}, {}", fileName, compressedFilePath);
         } catch (IOException e) {
             log.error("Error deleting files: {}", e.getMessage());
