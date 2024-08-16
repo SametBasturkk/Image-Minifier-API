@@ -1,0 +1,3 @@
+com\image\minifier\common\util\FileUtil.class
+com\image\minifier\common\util\ObjectConverter.class
+com\image\minifier\common\model\CompressImageTopicModel.class

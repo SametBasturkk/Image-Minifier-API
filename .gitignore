@@ -1,4 +1,3 @@
-/target/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -123,7 +122,6 @@ local.properties
 hs_err_pid*
 
 ### Maven ###
-target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -189,7 +187,6 @@ build/
 .settings
 bin
 build
-target
 dependency-reduced-pom.xml
 *.sublime-*
 /scratch
