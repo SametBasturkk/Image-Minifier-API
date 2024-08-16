@@ -25,7 +25,7 @@ public class ImageListenerService {
         this.executor = executor;
     }
 
-    @KafkaListener(topics = "compression-topic", groupId = "compression-group")
+    @KafkaListener(topics = "compression-topic", groupId = "group_id")
     public void consume(CompressImageTopicModel imageInfo) {
         CompletableFuture<CompressImageTopicModel> compressionFuture = CompletableFuture.supplyAsync(() -> {
             imageCompressorService.compressImage(

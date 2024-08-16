@@ -1,7 +1,6 @@
 package com.image.minifier.common.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,18 +13,13 @@ import java.util.UUID;
 @Slf4j
 public class FileUtil {
 
-    @Value("${app.upload.dir}")
-    public static String UPLOAD_DIR;
+    public static String UPLOAD_DIR = "./uploads/";
 
-    @Value("${app.compression.dir}")
-    public static String COMPRESSED_DIR;
+    public static String COMPRESSED_DIR = "./compressed/";
 
-    @Value("${app.compression.png.extension}")
-    public static String PNG_EXTENSION;
-    @Value("${app.compression.jpg.extension}")
-    public static String JPG_EXTENSION;
-    @Value("${app.compression.jpeg.extension}")
-    public static String JPEG_EXTENSION;
+    public static String PNG_EXTENSION = ".png";
+    public static String JPG_EXTENSION = ".jpg";
+    public static String JPEG_EXTENSION = ".jpeg";
 
     public Path saveUploadedFile(byte[] file, UUID uuid) throws IOException {
         Path uploadDirectory = Files.createDirectories(Paths.get(UPLOAD_DIR));

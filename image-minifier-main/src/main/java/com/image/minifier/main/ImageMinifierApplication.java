@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 @Slf4j
 @ComponentScan(basePackages = {
         "com.image.minifier.common",
-        "com.kafka.producer",
         "com.image.minifier.main",
 })
 @SpringBootApplication
