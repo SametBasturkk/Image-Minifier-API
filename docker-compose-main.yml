@@ -84,6 +84,29 @@ services:
     depends_on:
       - elasticsearch
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_PORT: 5432
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: samet123
+      KC_DB_URL_DATABASE: db_keycloak
+      KC_HOSTNAME: 185.136.206.146:8081
+      KC_PROXY: edge
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_TRANSACTION_XA_ENABLED: false
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    command: start-dev
+
+
   app:
     image: sametklou1907/image-minifier-main:latest
     container_name: main-minifier
@@ -124,7 +147,6 @@ services:
     container_name: kafka-consumer
     depends_on:
       - app
-
 
 volumes:
   postgres_data:
