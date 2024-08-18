@@ -10,8 +10,12 @@ com\image\minifier\main\configuration\RedisConfiguration.class
 com\image\minifier\main\model\ImageStatus.class
 com\image\minifier\main\producer\KafkaPublisherService.class
 com\image\minifier\main\repository\StatisticsRepository.class
+com\image\minifier\main\controller\UserController.class
+com\image\minifier\main\service\UserService.class
+com\image\minifier\main\dto\CreateUserRequest.class
 com\image\minifier\main\exception\CompressionException.class
 com\image\minifier\main\configuration\Redis.class
+com\image\minifier\main\configuration\KeycloakConfig.class
 com\image\minifier\main\repository\ImageStatusRepository.class
 com\image\minifier\main\configuration\ExecutorServiceConfig.class
 com\image\minifier\main\service\ImageProcessorService.class

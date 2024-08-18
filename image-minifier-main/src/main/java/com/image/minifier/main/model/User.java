@@ -19,8 +19,6 @@ public class User {
     private long id;
     @Column(name = "username")
     private String username;
-    @Column(name = "password")
-    private String password;
     @Column(name = "apiKey")
     private String apiKey;
     @Column(name = "email")
@@ -30,9 +28,8 @@ public class User {
     @Column(name = "last_login")
     private Date lastLogin;
 
-    public User(String username, String password, String apiKey, String email, Date createdOn, Date lastLogin) {
+    public User(String username, String apiKey, String email, Date createdOn, Date lastLogin) {
         this.username = username;
-        this.password = password;
         this.apiKey = apiKey;
         this.email = email;
         this.createdOn = createdOn;

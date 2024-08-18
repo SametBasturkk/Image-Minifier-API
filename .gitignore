@@ -200,3 +200,5 @@ Image-Minifier-API.zip
 /compressed
 jpegoptim.exe
 pngquant.exe
+/target/
+!/target/*.jar

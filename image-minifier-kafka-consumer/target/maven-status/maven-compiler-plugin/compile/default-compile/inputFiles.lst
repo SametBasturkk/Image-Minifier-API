@@ -1,6 +1,6 @@
-C:\Users\samet.basturk\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\service\ImageCompressSender.java
-C:\Users\samet.basturk\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\KafkaImageConsumerApplication.java
-C:\Users\samet.basturk\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\configuration\KafkaProducerConfig.java
-C:\Users\samet.basturk\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\service\ImageListenerService.java
-C:\Users\samet.basturk\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\configuration\KafkaConsumerConfig.java
-C:\Users\samet.basturk\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\compression\ImageCompressorService.java
+C:\Users\samet\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\compression\ImageCompressorService.java
+C:\Users\samet\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\configuration\KafkaConsumerConfig.java
+C:\Users\samet\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\configuration\KafkaProducerConfig.java
+C:\Users\samet\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\service\ImageCompressSender.java
+C:\Users\samet\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\service\ImageListenerService.java
+C:\Users\samet\Documents\GitHub\Image-Minifier-API\image-minifier-kafka-consumer\src\main\java\com\kafka\consumer\KafkaImageConsumerApplication.java
