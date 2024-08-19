@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.representations.AccessTokenResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,11 +13,20 @@ import org.springframework.context.annotation.Configuration;
 public class KeycloakConfig {
 
 
-    public static final String REALM = "minifier";
-    public static final String SERVER_URL = "http://localhost:8081/auth";
-    public static final String CLIENT_ID = "admin-cli";
-    public static final String CLIENT_SECRET = "TRXOHE4LbDRHtgoPMxVFBqBvT2dwhCZy";
-    public static final String GRANT_TYPE = "client_credentials";
+    @Value("${keycloak.realm}")
+    public String REALM;
+
+    @Value("${keycloak.auth-server-url}")
+    public String SERVER_URL;
+
+    @Value("${keycloak.resource}")
+    public String CLIENT_ID;
+
+    @Value("${keycloak.credentials.secret}")
+    public String CLIENT_SECRET;
+
+    @Value("${keycloak.grant-type}")
+    public String GRANT_TYPE;
 
     @Bean
     public Keycloak run() {

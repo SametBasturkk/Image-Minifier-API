@@ -4,21 +4,25 @@ import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.image.minifier.main.configuration.KeycloakConfig.REALM;
 
 @Service
 public class UserService {
 
     private KeycloakConfig keycloak;
 
+    @Value("${keycloak.realm}")
+    public String REALM;
+
     public UserService(KeycloakConfig keycloak) {
         this.keycloak = keycloak;
     }
+
+
 
     public void createUser(CreateUserRequest request) {
         UserRepresentation user = new UserRepresentation();
