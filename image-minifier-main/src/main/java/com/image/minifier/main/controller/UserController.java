@@ -3,11 +3,8 @@ package com.image.minifier.main.controller;
 import com.image.minifier.main.dto.CreateUserRequest;
 import com.image.minifier.main.service.UserService;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -39,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok("User updated successfully");
     }
 
-    @PostMapping("/get")
+    @GetMapping("/get")
     public ResponseEntity<List<UserRepresentation>> getUsers() {
         return ResponseEntity.ok(userService.getUsers());
     }

@@ -100,6 +100,7 @@ services:
       KC_PROXY: edge
       KC_HTTP_RELATIVE_PATH: /auth
       KC_TRANSACTION_XA_ENABLED: false
+      KEYCLOAK_LOG_LEVEL: ALL
     ports:
       - "8081:8080"
     depends_on:
@@ -135,12 +136,18 @@ services:
       ELK_LOGSTASH_PORT: 5000
       ELK_ENABLE: "true"
       APP_LOG_IDENTIFIER: image-minifier-main
+      KEYCLOAK_REALM: minifier
+      KEYCLOAK_AUTH_SERVER_URL: http://185.136.206.146:8081/auth
+      KEYCLOAK_RESOURCE: admin-cli
+      KEYCLOAK_CREDENTIALS_SECRET: TRXOHE4LbDRHtgoPMxVFBqBvT2dwhCZy
+      KEYCLOAK_GRANT_TYPE: client_credentials
     depends_on:
       - postgres
       - redis
       - kafka
     volumes:
       - ./logs:/logs
+
 
   kafka-consumer:
     image: consumer-kafka

@@ -70,6 +70,14 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
             <version>LATEST</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+
+
         <dependency>
             <groupId>com.ImageProcessor</groupId>
             <artifactId>image-minifier-common</artifactId>
