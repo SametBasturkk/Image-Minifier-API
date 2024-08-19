@@ -23,7 +23,6 @@ public class UserService {
     }
 
 
-
     public void createUser(CreateUserRequest request) {
         UserRepresentation user = new UserRepresentation();
         user.setUsername(request.getUsername());
@@ -32,6 +31,23 @@ public class UserService {
         user.setEnabled(true);
         keycloak.run().realm(REALM).users().create(user);
     }
+
+    public void deleteUser(String username) {
+        keycloak.run().realm(REALM).users().delete(username);
+    }
+
+    public void updateUser(String username, CreateUserRequest request) {
+        UserRepresentation user = keycloak.run().realm(REALM).users().search(username).get(0);
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setCredentials(createCredentialRepresentation(request.getPassword()));
+        keycloak.run().realm(REALM).users().get(user.getId()).update(user);
+    }
+
+    public List<UserRepresentation> getUsers() {
+        return keycloak.run().realm(REALM).users().list();
+    }
+
 
     private List<CredentialRepresentation> createCredentialRepresentation(String password) {
         List<CredentialRepresentation> resp = new ArrayList<>();
