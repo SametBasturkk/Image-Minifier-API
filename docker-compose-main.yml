@@ -107,8 +107,7 @@ services:
       - postgres
     command: start-dev
 
-
-  app:
+  main-minifier:
     image: sametklou1907/image-minifier-main:latest
     container_name: main-minifier
     ports:
@@ -145,15 +144,18 @@ services:
       - postgres
       - redis
       - kafka
+      - keycloak
+      - elasticsearch
+      - kibana
+      - logstash
     volumes:
       - ./logs:/logs
-
 
   kafka-consumer:
     image: consumer-kafka
     container_name: kafka-consumer
     depends_on:
-      - app
+      - main-minifier
 
 volumes:
   postgres_data:
