@@ -28,7 +28,10 @@ public class UserService {
         user.setUsername(request.getUsername());
         user.setCredentials(createCredentialRepresentation(request.getPassword()));
         user.setEmail(request.getEmail());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
         user.setEnabled(true);
+        user.setEmailVerified(true);
         keycloak.run().realm(REALM).users().create(user);
     }
 
