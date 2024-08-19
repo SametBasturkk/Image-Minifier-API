@@ -101,6 +101,7 @@ services:
       KC_HTTP_RELATIVE_PATH: /auth
       KC_TRANSACTION_XA_ENABLED: false
       KEYCLOAK_LOG_LEVEL: ALL
+      KC_HEALTH_ENABLED: true
     ports:
       - "8081:8080"
     depends_on:
@@ -112,6 +113,7 @@ services:
     container_name: main-minifier
     ports:
       - "8085:8085"
+      - "5005:5005"  # Debug port
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_image
       SPRING_DATASOURCE_USERNAME: postgres
@@ -140,6 +142,7 @@ services:
       KEYCLOAK_RESOURCE: admin-cli
       KEYCLOAK_CREDENTIALS_SECRET: TRXOHE4LbDRHtgoPMxVFBqBvT2dwhCZy
       KEYCLOAK_GRANT_TYPE: client_credentials
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"  # Enable remote debugging
     depends_on:
       - postgres
       - redis
