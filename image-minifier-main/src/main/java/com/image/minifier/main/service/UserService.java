@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.image.minifier.main.configuration.KeycloakConfig.REALM;
+
 @Service
 public class UserService {
 
@@ -24,7 +26,7 @@ public class UserService {
         user.setCredentials(createCredentialRepresentation(request.getPassword()));
         user.setEmail(request.getEmail());
         user.setEnabled(true);
-        keycloak.getInstance().realm(KeycloakConfig.REALM).users().create(user);
+        keycloak.run().realm(REALM).users().create(user);
     }
 
     private List<CredentialRepresentation> createCredentialRepresentation(String password) {
