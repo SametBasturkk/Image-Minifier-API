@@ -7,7 +7,6 @@ import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.annotation.Retryable;
 
 @Configuration
 @Slf4j
@@ -30,7 +29,6 @@ public class KeycloakConfig {
     public String GRANT_TYPE;
 
     @Bean
-    @Retryable
     public Keycloak run() {
         try {
             log.info("Attempting to connect to Keycloak at {}", SERVER_URL);
