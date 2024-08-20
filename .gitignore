@@ -202,3 +202,5 @@ jpegoptim.exe
 pngquant.exe
 /target/
 !/target/*.jar
+/image-minifier-common/target
+/image-minifier-main/target

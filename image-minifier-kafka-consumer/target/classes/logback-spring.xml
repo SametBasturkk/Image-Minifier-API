@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <springProperty scope="context" name="logstashServer" source="elk.logstash.server"/>
+    <springProperty scope="context" name="logstashPort" source="elk.logstash.port"/>
+    <springProperty scope="context" name="identifier" source="app.log.identifier"/>
+
+
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${logstashServer}:${logstashPort}</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"Identifier":"${identifier}"}</customFields>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="LOGSTASH"/>
+    </root>
+
+    <logger name="org.springframework.web" level="DEBUG"/>
+    <logger name="org.hibernate" level="ERROR"/>
+</configuration>
