@@ -1,6 +1,0 @@
-com\kafka\consumer\configuration\KafkaConsumerConfig.class
-com\kafka\consumer\configuration\KafkaProducerConfig.class
-com\kafka\consumer\KafkaImageConsumerApplication.class
-com\kafka\consumer\service\ImageCompressSender.class
-com\kafka\consumer\compression\ImageCompressorService.class
-com\kafka\consumer\service\ImageListenerService.class
