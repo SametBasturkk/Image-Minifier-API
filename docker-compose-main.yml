@@ -150,7 +150,6 @@ services:
       KEYCLOAK_RESOURCE: admin-cli
       KEYCLOAK_CREDENTIALS_SECRET: TRXOHE4LbDRHtgoPMxVFBqBvT2dwhCZy
       KEYCLOAK_GRANT_TYPE: client_credentials
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"  # Enable remote debugging
     depends_on:
       - postgres
       - redis
