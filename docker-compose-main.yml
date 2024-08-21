@@ -11,12 +11,14 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
+    restart: unless-stopped
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -24,6 +26,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -39,6 +42,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    restart: unless-stopped
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
@@ -58,6 +62,7 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+    restart: unless-stopped
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.9.0
@@ -68,6 +73,7 @@ services:
       - "5601:5601"
     depends_on:
       - elasticsearch
+    restart: unless-stopped
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.9.0
@@ -83,6 +89,7 @@ services:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     depends_on:
       - elasticsearch
+    restart: unless-stopped
 
   keycloak:
     image: quay.io/keycloak/keycloak:22.0.1
@@ -107,6 +114,7 @@ services:
     depends_on:
       - postgres
     command: start-dev
+    restart: unless-stopped
 
   main-minifier:
     image: sametklou1907/image-minifier-main:latest
@@ -133,12 +141,12 @@ services:
       SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 10MB
       SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 10MB
       APP_SUPPORTED_EXTENSIONS: png,jpg,jpeg
-      ELK_LOGSTASH_SERVER: 185.136.206.146
+      ELK_LOGSTASH_SERVER: 185.136.206.146 # Reverted back to IP
       ELK_LOGSTASH_PORT: 5000
       ELK_ENABLE: "true"
       APP_LOG_IDENTIFIER: image-minifier-main
       KEYCLOAK_REALM: minifier
-      KEYCLOAK_AUTH_SERVER_URL: http://185.136.206.146:8081/auth
+      KEYCLOAK_AUTH_SERVER_URL: http://185.136.206.146:8081/auth # Reverted back to IP
       KEYCLOAK_RESOURCE: admin-cli
       KEYCLOAK_CREDENTIALS_SECRET: TRXOHE4LbDRHtgoPMxVFBqBvT2dwhCZy
       KEYCLOAK_GRANT_TYPE: client_credentials
@@ -153,12 +161,26 @@ services:
       - logstash
     volumes:
       - ./logs:/logs
+    restart: unless-stopped
 
   kafka-consumer:
     image: consumer-kafka
     container_name: kafka-consumer
     depends_on:
       - main-minifier
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: samet.basturk@hotmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
 
 volumes:
   postgres_data:
