@@ -47,7 +47,8 @@ public class UserService {
 
     public void deleteUser(String username) {
         UserResource test = keycloak.userResource().get(username);
-        if (test == null) {
+        log.info("Attempting to delete user {}", test.toRepresentation().getUsername());
+        if (username == test.toRepresentation().getUsername()) {
             log.error("User {} not found", username);
             throw new RuntimeException("User not found");
         }
