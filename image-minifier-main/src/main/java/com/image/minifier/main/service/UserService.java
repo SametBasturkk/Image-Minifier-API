@@ -4,6 +4,7 @@ import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +46,12 @@ public class UserService {
     }
 
     public void deleteUser(String username) {
-        keycloak.userResource().get(username).remove();
+        UserResource test = keycloak.userResource().get(username);
+        if (test == null) {
+            log.error("User {} not found", username);
+            throw new RuntimeException("User not found");
+        }
+        test.remove();
         log.info("User {} deleted", username);
     }
 
