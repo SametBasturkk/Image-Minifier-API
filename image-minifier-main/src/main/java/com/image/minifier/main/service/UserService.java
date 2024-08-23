@@ -39,16 +39,14 @@ public class UserService {
         log.info("User {} created", request.getUsername());
         if (response.getStatus() != 201) {
             log.error("Failed to create user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
+            throw new RuntimeException("Failed to create user");
         }
         response.close();
     }
 
     public void deleteUser(String username) {
-        Response response = keycloak.userResource().delete(username);
+        keycloak.userResource().get(username).remove();
         log.info("User {} deleted", username);
-        if (response.getStatus() != 204) {
-            log.error("Failed to delete user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
-        }
     }
 
     public void updateUser(String username, CreateUserRequest request) {
@@ -61,6 +59,7 @@ public class UserService {
         Response response = keycloak.userResource().create(user);
         if (response.getStatus() != 204) {
             log.error("Failed to update user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
+            throw new RuntimeException("Failed to update user");
         }
     }
 
