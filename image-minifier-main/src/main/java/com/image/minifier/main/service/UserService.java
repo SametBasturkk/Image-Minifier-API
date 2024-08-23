@@ -2,7 +2,9 @@ package com.image.minifier.main.service;
 
 import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
