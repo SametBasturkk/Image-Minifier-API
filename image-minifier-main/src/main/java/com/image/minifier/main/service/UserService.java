@@ -39,7 +39,9 @@ public class UserService {
         UsersResource userResource = keycloak.run().realm(REALM).users();
         Response response = userResource.create(user);
         log.info("User {} created", request.getUsername());
-        log.info("Response status: {}", response.getStatus());
+        if (response.getStatus() != 201) {
+            log.error("Failed to create user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
+        }
         response.close();
     }
 
