@@ -4,7 +4,6 @@ import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,8 +35,7 @@ public class UserService {
         user.setLastName(request.getLastName());
         user.setEnabled(true);
         user.setEmailVerified(true);
-        UsersResource userResource = keycloak.run().realm(REALM).users();
-        Response response = userResource.create(user);
+        Response response = keycloak.userResource().create(user);
         log.info("User {} created", request.getUsername());
         if (response.getStatus() != 201) {
             log.error("Failed to create user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
@@ -46,8 +44,11 @@ public class UserService {
     }
 
     public void deleteUser(String username) {
-        keycloak.run().realm(REALM).users().delete(username);
+        Response response = keycloak.userResource().delete(username);
         log.info("User {} deleted", username);
+        if (response.getStatus() != 204) {
+            log.error("Failed to delete user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
+        }
     }
 
     public void updateUser(String username, CreateUserRequest request) {
@@ -57,11 +58,15 @@ public class UserService {
         user.setCredentials(createCredentialRepresentation(request.getPassword()));
         keycloak.run().realm(REALM).users().get(user.getId()).update(user);
         log.info("User {} updated", username);
+        Response response = keycloak.userResource().create(user);
+        if (response.getStatus() != 204) {
+            log.error("Failed to update user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
+        }
     }
 
     public List<UserRepresentation> getUsers() {
         List<UserRepresentation> listOfUsers = keycloak.run().realm(REALM).users().list();
-        log.info("List of users: {}", listOfUsers);
+        log.info("Users retrieved");
         return listOfUsers;
     }
 

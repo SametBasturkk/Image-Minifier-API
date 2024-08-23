@@ -3,6 +3,7 @@ package com.image.minifier.main.configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -43,5 +44,10 @@ public class KeycloakConfig {
             log.error("Failed to connect to Keycloak", e);
             throw new RuntimeException("Could not connect to Keycloak", e);
         }
+    }
+
+    @Bean
+    public UsersResource userResource() {
+        return run().realm(REALM).users();
     }
 }
