@@ -127,6 +127,7 @@ public class UserService {
                     .serverUrl(keycloak.getSERVER_URL())
                     .realm(keycloak.getREALM())
                     .clientId(keycloak.getCLIENT_ID())
+                    .clientSecret(keycloak.getCLIENT_SECRET())
                     .username(username)
                     .password(password)
                     .grantType(OAuth2Constants.PASSWORD)
