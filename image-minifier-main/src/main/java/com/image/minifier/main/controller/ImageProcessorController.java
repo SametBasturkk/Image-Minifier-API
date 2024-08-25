@@ -42,15 +42,5 @@ public class ImageProcessorController {
         return imageProcessorService.processImage(file, quality, apiKey, token);
     }
 
-    @PostMapping(value = "/login")
-    public ResponseEntity<String> login(String username, String password) {
-        log.info("Received request to login user: {}", username);
-        return ResponseEntity.ok(userService.userLogin(username, password));
-    }
 
-    @GetMapping(value = "/get-api-key")
-    public ResponseEntity<String> getApiKey(String token) {
-        log.info("Received request to get api key for user: {}", token);
-        return ResponseEntity.ok(userService.getApiKey(token));
-    }
 }
