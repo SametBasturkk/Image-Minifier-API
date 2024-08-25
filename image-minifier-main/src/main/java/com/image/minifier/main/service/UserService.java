@@ -4,9 +4,7 @@ import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -123,15 +121,7 @@ public class UserService {
     public String userLogin(String username, String password) {
         log.info("Attempting login for user: {}", username);
         try {
-            Keycloak keycloakClient = KeycloakBuilder.builder()
-                    .serverUrl(keycloak.getSERVER_URL())
-                    .realm(keycloak.getREALM())
-                    .clientId(keycloak.getCLIENT_ID())
-                    .clientSecret(keycloak.getCLIENT_SECRET())
-                    .username(username)
-                    .password(password)
-                    .grantType(OAuth2Constants.PASSWORD)
-                    .build();
+            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), username, password, keycloak.getCLIENT_ID(), keycloak.getCLIENT_SECRET());
             AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
             if (tokenResponse != null && tokenResponse.getToken() != null) {
                 log.info("User {} logged in successfully", username);
