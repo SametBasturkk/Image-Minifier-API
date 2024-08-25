@@ -26,8 +26,8 @@ public class UserService {
         this.keycloak = keycloak;
     }
 
-
     public void createUser(CreateUserRequest request) {
+        log.info("Attempting to create user: {}", request.getUsername());
         HashMap<String, List<String>> attributes = new HashMap<>();
         attributes.put("api_key", List.of(UUID.randomUUID().toString()));
         UserRepresentation user = new UserRepresentation();
@@ -41,45 +41,43 @@ public class UserService {
         user.setAttributes(attributes);
         user.setRealmRoles(List.of("basic"));
         Response response = keycloak.userResource().create(user);
-        log.info("User {} created", request.getUsername());
-        if (response.getStatus() != 201) {
-            log.error("Failed to create user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
+        if (response.getStatus() == 201) {
+            log.info("User {} created successfully", request.getUsername());
+        } else {
+            log.error("Failed to create user {}. Status code: {}, Response body: {}", request.getUsername(), response.getStatus(), response.readEntity(String.class));
             throw new RuntimeException("Failed to create user");
         }
         response.close();
     }
 
     public void deleteUser(String username) {
-        UserResource test = keycloak.userResource().get(username);
-        log.info("Attempting to delete user {}", test.toRepresentation().getUsername());
-        if (username == test.toRepresentation().getUsername()) {
+        log.info("Attempting to delete user: {}", username);
+        UserResource userResource = keycloak.userResource().get(username);
+        UserRepresentation user = userResource.toRepresentation();
+        if (user == null || !username.equals(user.getUsername())) {
             log.error("User {} not found", username);
             throw new RuntimeException("User not found");
         }
-        test.remove();
-        log.info("User {} deleted", username);
+        userResource.remove();
+        log.info("User {} deleted successfully", username);
     }
 
     public void updateUser(CreateUserRequest request) {
+        log.info("Attempting to update user: {}", request.getUsername());
         UserRepresentation user = keycloak.run().realm(keycloak.getREALM()).users().search(request.getUsername()).get(0);
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setCredentials(createCredentialRepresentation(request.getPassword()));
         keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
-        log.info("User {} updated", request.getUsername());
-        Response response = keycloak.userResource().create(user);
-        if (response.getStatus() != 204) {
-            log.error("Failed to update user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
-            throw new RuntimeException("Failed to update user");
-        }
+       
     }
 
     public List<UserRepresentation> getUsers() {
+        log.info("Retrieving all users");
         List<UserRepresentation> listOfUsers = keycloak.run().realm(keycloak.getREALM()).users().list();
-        log.info("Users retrieved");
+        log.info("Retrieved {} users", listOfUsers.size());
         return listOfUsers;
     }
-
 
     private List<CredentialRepresentation> createCredentialRepresentation(String password) {
         List<CredentialRepresentation> resp = new ArrayList<>();
@@ -88,38 +86,43 @@ public class UserService {
         passwordCred.setType(CredentialRepresentation.PASSWORD);
         passwordCred.setValue(password);
         resp.add(passwordCred);
-        log.info("Credential representation created");
         return resp;
     }
 
     public UserRepresentation getUser(String username) {
-        UserRepresentation user = keycloak.run().realm(keycloak.getREALM()).users().search(username).get(0);
-        log.info("User {} retrieved", username);
-        return user;
+        log.info("Retrieving user: {}", username);
+        List<UserRepresentation> users = keycloak.run().realm(keycloak.getREALM()).users().search(username);
+        if (users.isEmpty()) {
+            log.error("User {} not found", username);
+            throw new RuntimeException("User not found");
+        }
+        log.info("User {} retrieved successfully", username);
+        return users.get(0);
     }
 
     public void updateApiKey(String username) {
-        UserRepresentation user = keycloak.run().realm(keycloak.getREALM()).users().search(username).get(0);
+        log.info("Updating API key for user: {}", username);
+        UserRepresentation user = getUser(username);
         HashMap<String, List<String>> attributes = new HashMap<>();
         attributes.put("api_key", List.of(UUID.randomUUID().toString()));
         user.setAttributes(attributes);
         keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
-        log.info("API key updated for user {}", username);
+        log.info("API key updated successfully for user {}", username);
     }
 
     public void updatePlanRole(String username, String plan) {
-        UserRepresentation user = keycloak.run().realm(keycloak.getREALM()).users().search(username).get(0);
+        log.info("Updating plan role for user: {} to plan: {}", username, plan);
+        UserRepresentation user = getUser(username);
         user.setRealmRoles(List.of(plan));
         keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
-        log.info("Plan role updated for user {}", username);
+        log.info("Plan role updated successfully for user {} to {}", username, plan);
     }
 
     public String userLogin(String username, String password) {
+        log.info("Attempting login for user: {}", username);
         try {
             Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), username, password, keycloak.getCLIENT_ID());
-
             AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
-
             if (tokenResponse != null && tokenResponse.getToken() != null) {
                 log.info("User {} logged in successfully", username);
                 return tokenResponse.getToken();
@@ -134,10 +137,16 @@ public class UserService {
     }
 
     public UserRepresentation getUserByToken(String token) {
+        log.info("Retrieving user by token");
         try {
             Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), token, keycloak.getCLIENT_ID());
-
-            return keycloakClient.realm(keycloak.getREALM()).users().search(token).get(0);
+            List<UserRepresentation> users = keycloakClient.realm(keycloak.getREALM()).users().search(token);
+            if (users.isEmpty()) {
+                log.error("No user found for the given token");
+                return null;
+            }
+            log.info("User retrieved successfully by token");
+            return users.get(0);
         } catch (Exception e) {
             log.error("Error during getting user by token: {}", e.getMessage());
             return null;
@@ -145,38 +154,46 @@ public class UserService {
     }
 
     public String getApiKey(String token) {
+        log.info("Retrieving API key for token");
         UserRepresentation user = getUserByToken(token);
-        if (user != null) {
+        if (user != null && user.getAttributes() != null && user.getAttributes().containsKey("api_key")) {
+            log.info("API key retrieved successfully");
             return user.getAttributes().get("api_key").get(0);
         } else {
+            log.error("API key not found for the given token");
             return null;
         }
     }
 
     public void validateToken(String token) {
+        log.info("Validating token");
         try {
             Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), token, keycloak.getCLIENT_ID());
-
             AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
-
             if (tokenResponse != null && tokenResponse.getToken() != null) {
-                log.info("Token {} is valid", token);
+                log.info("Token is valid");
             } else {
-                log.error("Token {} is invalid", token);
+                log.error("Token is invalid");
+                throw new RuntimeException("Invalid token");
             }
         } catch (Exception e) {
-            log.error("Error during token validation for token {}: {}", token, e.getMessage());
+            log.error("Error during token validation: {}", e.getMessage());
+            throw new RuntimeException("Error validating token", e);
         }
     }
 
-
     public void validateApiKey(String apiKey, String token) {
+        log.info("Validating API key");
         UserRepresentation user = getUserByToken(token);
-        List<String> attrib = user.getAttributes().get("api_key");
-        if (attrib != null && attrib.contains(apiKey)) {
-            log.info("API key {} is valid", apiKey);
+        if (user == null) {
+            log.error("User not found for the given token");
+            throw new RuntimeException("User not found");
+        }
+        List<String> apiKeys = user.getAttributes().get("api_key");
+        if (apiKeys != null && apiKeys.contains(apiKey)) {
+            log.info("API key is valid");
         } else {
-            log.error("API key {} is invalid", apiKey);
+            log.error("Invalid API key");
             throw new RuntimeException("Invalid API key");
         }
     }
