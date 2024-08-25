@@ -4,7 +4,9 @@ import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -69,7 +71,7 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setCredentials(createCredentialRepresentation(request.getPassword()));
         keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
-       
+
     }
 
     public List<UserRepresentation> getUsers() {
@@ -121,18 +123,25 @@ public class UserService {
     public String userLogin(String username, String password) {
         log.info("Attempting login for user: {}", username);
         try {
-            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), username, password, keycloak.getCLIENT_ID());
+            Keycloak keycloakClient = KeycloakBuilder.builder()
+                    .serverUrl(keycloak.getSERVER_URL())
+                    .realm(keycloak.getREALM())
+                    .clientId(keycloak.getCLIENT_ID())
+                    .username(username)
+                    .password(password)
+                    .grantType(OAuth2Constants.PASSWORD)
+                    .build();
             AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
             if (tokenResponse != null && tokenResponse.getToken() != null) {
                 log.info("User {} logged in successfully", username);
                 return tokenResponse.getToken();
             } else {
                 log.error("Login failed for user {}", username);
-                return null;
+                throw new RuntimeException("Login failed");
             }
         } catch (Exception e) {
             log.error("Error during login for user {}: {}", username, e.getMessage());
-            return null;
+            throw new RuntimeException("Error during login", e);
         }
     }
 
