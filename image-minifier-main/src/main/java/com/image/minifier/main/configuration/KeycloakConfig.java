@@ -53,4 +53,15 @@ public class KeycloakConfig {
         return run().realm(REALM).users();
     }
 
+    @Bean
+    public Keycloak keycloakClient(String username, String password) {
+        return Keycloak.getInstance(SERVER_URL, REALM, username, password, CLIENT_ID, CLIENT_SECRET);
+    }
+
+    @Bean
+    public Keycloak keycloakClient(String token) {
+        return Keycloak.getInstance(SERVER_URL, REALM, token, CLIENT_ID);
+    }
+
+
 }

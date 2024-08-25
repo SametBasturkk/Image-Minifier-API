@@ -4,7 +4,6 @@ import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -64,17 +63,17 @@ public class UserService {
 
     public void updateUser(CreateUserRequest request) {
         log.info("Attempting to update user: {}", request.getUsername());
-        UserRepresentation user = keycloak.run().realm(keycloak.getREALM()).users().search(request.getUsername()).get(0);
+        UserRepresentation user = keycloak.userResource().search(request.getUsername()).get(0);
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setCredentials(createCredentialRepresentation(request.getPassword()));
-        keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
+        keycloak.userResource().get(user.getId()).update(user);
 
     }
 
     public List<UserRepresentation> getUsers() {
         log.info("Retrieving all users");
-        List<UserRepresentation> listOfUsers = keycloak.run().realm(keycloak.getREALM()).users().list();
+        List<UserRepresentation> listOfUsers = keycloak.userResource().list();
         log.info("Retrieved {} users", listOfUsers.size());
         return listOfUsers;
     }
@@ -91,7 +90,7 @@ public class UserService {
 
     public UserRepresentation getUser(String username) {
         log.info("Retrieving user: {}", username);
-        List<UserRepresentation> users = keycloak.run().realm(keycloak.getREALM()).users().search(username);
+        List<UserRepresentation> users = keycloak.userResource().search(username);
         if (users.isEmpty()) {
             log.error("User {} not found", username);
             throw new RuntimeException("User not found");
@@ -106,7 +105,7 @@ public class UserService {
         HashMap<String, List<String>> attributes = new HashMap<>();
         attributes.put("api_key", List.of(UUID.randomUUID().toString()));
         user.setAttributes(attributes);
-        keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
+        keycloak.userResource().get(user.getId()).update(user);
         log.info("API key updated successfully for user {}", username);
     }
 
@@ -114,15 +113,14 @@ public class UserService {
         log.info("Updating plan role for user: {} to plan: {}", username, plan);
         UserRepresentation user = getUser(username);
         user.setRealmRoles(List.of(plan));
-        keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
+        keycloak.userResource().get(user.getId()).update(user);
         log.info("Plan role updated successfully for user {} to {}", username, plan);
     }
 
     public String userLogin(String username, String password) {
         log.info("Attempting login for user: {}", username);
         try {
-            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), username, password, keycloak.getCLIENT_ID(), keycloak.getCLIENT_SECRET());
-            AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
+            AccessTokenResponse tokenResponse = keycloak.keycloakClient(username, password).tokenManager().getAccessToken();
             if (tokenResponse != null && tokenResponse.getToken() != null) {
                 log.info("User {} logged in successfully", username);
                 return tokenResponse.getToken();
@@ -139,8 +137,7 @@ public class UserService {
     public UserRepresentation getUserByToken(String token) {
         log.info("Retrieving user by token");
         try {
-            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), token, keycloak.getCLIENT_ID());
-            List<UserRepresentation> users = keycloakClient.realm(keycloak.getREALM()).users().search(token);
+            List<UserRepresentation> users = keycloak.userResource().search(token);
             if (users.isEmpty()) {
                 log.error("No user found for the given token");
                 return null;
@@ -168,8 +165,7 @@ public class UserService {
     public void validateToken(String token) {
         log.info("Validating token");
         try {
-            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), token, keycloak.getCLIENT_ID());
-            AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
+            AccessTokenResponse tokenResponse = keycloak.keycloakClient(token).tokenManager().getAccessToken();
             if (tokenResponse != null && tokenResponse.getToken() != null) {
                 log.info("Token is valid");
             } else {
