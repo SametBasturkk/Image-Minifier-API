@@ -23,22 +23,24 @@ public class ImageProcessorService {
     private final StatisticsService statisticsService;
     private final ImageStatusService imageStatusService;
     private final ScheduledExecutorService executorService;
+    private final UserService userService;
 
-    public ImageProcessorService(KafkaPublisherService kafkaPublisherService, StatisticsService statisticsService, ImageStatusService imageStatusService, ScheduledExecutorService executorService) {
+    public ImageProcessorService(KafkaPublisherService kafkaPublisherService, StatisticsService statisticsService, ImageStatusService imageStatusService, ScheduledExecutorService executorService, UserService userService) {
         this.kafkaPublisherService = kafkaPublisherService;
         this.statisticsService = statisticsService;
         this.imageStatusService = imageStatusService;
         this.executorService = executorService;
+        this.userService = userService;
     }
 
-    public ResponseEntity<CompressedImageResponse> processImage(MultipartFile file, Integer quality) {
+    public ResponseEntity<CompressedImageResponse> processImage(MultipartFile file, Integer quality, String apiKey, String token) {
+        userService.validateApiKey(apiKey, token);
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename().toLowerCase());
         try {
             UUID compressedFilePathUUID = kafkaPublisherService.publishCompressImageTopic(file, quality, "." + extension);
             ImageStatus imageStatus = new ImageStatus(compressedFilePathUUID, false, null);
             imageStatusService.saveImageStatus(imageStatus);
             log.info("Image processing started for file: {}", file.getOriginalFilename());
-
             return waitForImageCompression(imageStatus, file);
         } catch (IOException e) {
             log.error("Error processing image", e);

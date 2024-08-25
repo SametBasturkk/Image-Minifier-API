@@ -1,5 +1,6 @@
 package com.image.minifier.main.configuration;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Slf4j
+@Getter
 public class KeycloakConfig {
 
 
@@ -50,4 +52,5 @@ public class KeycloakConfig {
     public UsersResource userResource() {
         return run().realm(REALM).users();
     }
+
 }

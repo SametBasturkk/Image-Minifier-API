@@ -3,6 +3,7 @@ package com.image.minifier.main.controller;
 
 import com.image.minifier.main.dto.CompressedImageResponse;
 import com.image.minifier.main.service.ImageProcessorService;
+import com.image.minifier.main.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.constraints.Max;
@@ -11,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -23,9 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Validated
 public class ImageProcessorController {
     private final ImageProcessorService imageProcessorService;
+    private final UserService userService;
 
-    public ImageProcessorController(ImageProcessorService imageProcessorService) {
+    public ImageProcessorController(ImageProcessorService imageProcessorService, UserService userService) {
         this.imageProcessorService = imageProcessorService;
+        this.userService = userService;
     }
 
     @Operation(summary = "Upload and compress an image")
@@ -34,8 +34,23 @@ public class ImageProcessorController {
     @ApiResponse(responseCode = "415", description = "Unsupported media type")
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CompressedImageResponse> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("quality") @Min(0) @Max(100) Integer quality) {
+    public ResponseEntity<CompressedImageResponse> uploadImage(@RequestParam("file") MultipartFile file,
+                                                               @RequestParam("quality") @Min(0) @Max(100) Integer quality,
+                                                               @RequestParam("api_key") String apiKey,
+                                                               @RequestHeader("Authorization") String token) {
         log.info("Received request to upload and compress image: {}", file.getOriginalFilename());
-        return imageProcessorService.processImage(file, quality);
+        return imageProcessorService.processImage(file, quality, apiKey, token);
+    }
+
+    @PostMapping(value = "/login")
+    public ResponseEntity<String> login(String username, String password) {
+        log.info("Received request to login user: {}", username);
+        return ResponseEntity.ok(userService.userLogin(username, password));
+    }
+
+    @GetMapping(value = "/get-api-key")
+    public ResponseEntity<String> getApiKey(String token) {
+        log.info("Received request to get api key for user: {}", token);
+        return ResponseEntity.ok(userService.getApiKey(token));
     }
 }
