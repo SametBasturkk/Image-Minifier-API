@@ -139,7 +139,7 @@ public class UserService {
     public UserRepresentation getUserByToken(String token) {
         log.info("Retrieving user by token");
         try {
-            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), token, keycloak.getCLIENT_ID(), keycloak.getCLIENT_SECRET());
+            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), keycloak.getCLIENT_ID(), token);
             List<UserRepresentation> users = keycloakClient.realm(keycloak.getREALM()).users().search(token);
             if (users.isEmpty()) {
                 log.error("No user found for the given token");
