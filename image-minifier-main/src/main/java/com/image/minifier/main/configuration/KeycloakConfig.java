@@ -54,12 +54,12 @@ public class KeycloakConfig {
     }
 
     @Bean
-    public Keycloak keycloakClient(String username, String password) {
+    public Keycloak keycloakClientWithToken(String username, String password) {
         return Keycloak.getInstance(SERVER_URL, REALM, username, password, CLIENT_ID, CLIENT_SECRET);
     }
 
     @Bean
-    public Keycloak keycloakClient(String token) {
+    public Keycloak keycloakClientWithToken(String token) {
         return Keycloak.getInstance(SERVER_URL, REALM, token, CLIENT_ID);
     }
 
