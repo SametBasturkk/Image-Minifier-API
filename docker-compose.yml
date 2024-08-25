@@ -109,6 +109,9 @@ services:
       KC_TRANSACTION_XA_ENABLED: false
       KC_LOG_LEVEL: DEBUG
       KC_HEALTH_ENABLED: true
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
     ports:
       - "8081:8080"
     depends_on:
