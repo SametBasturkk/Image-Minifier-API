@@ -136,6 +136,7 @@ public class UserService {
         }
     }
 
+    //TODO= FIX GETINSTANCE NOT SUPPORTING TOKEN
     public UserRepresentation getUserByToken(String token) {
         log.info("Retrieving user by token");
         try {
