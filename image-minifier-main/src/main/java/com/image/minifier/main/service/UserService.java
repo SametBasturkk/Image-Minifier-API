@@ -120,7 +120,7 @@ public class UserService {
     public String userLogin(String username, String password) {
         log.info("Attempting login for user: {}", username);
         try {
-            AccessTokenResponse tokenResponse = keycloak.keycloakClientWithToken(username, password).tokenManager().getAccessToken();
+            AccessTokenResponse tokenResponse = keycloak.keycloakClientWithCredentials(username, password).tokenManager().getAccessToken();
             if (tokenResponse != null && tokenResponse.getToken() != null) {
                 log.info("User {} logged in successfully", username);
                 return tokenResponse.getToken();
