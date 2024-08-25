@@ -35,9 +35,9 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<String> updateUser(@RequestBody String username, @RequestBody CreateUserRequest request) {
-        userService.updateUser(username, request);
-        log.info("User updated successfully : {}", username);
+    public ResponseEntity<String> updateUser(@RequestBody CreateUserRequest request) {
+        userService.updateUser(request);
+        log.info("User updated successfully : {}", request.getUsername());
         return ResponseEntity.ok("User updated successfully");
     }
 
@@ -47,13 +47,13 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<String> login(@RequestParam("username") String username, @RequestParam("password") String password) {
         log.info("User logged in successfully : {}", userService.userLogin(username, password));
         return ResponseEntity.ok(userService.userLogin(username, password));
     }
 
     @GetMapping(value = "/get-api-key")
-    public ResponseEntity<String> getApiKey(@RequestParam String token) {
+    public ResponseEntity<String> getApiKey(@RequestParam("token") String token) {
         log.info("Received request to get api key for user: {}", token);
         log.info("Api key retrieved successfully : {}", userService.getApiKey(token));
         return ResponseEntity.ok(userService.getApiKey(token));

@@ -60,13 +60,13 @@ public class UserService {
         log.info("User {} deleted", username);
     }
 
-    public void updateUser(String username, CreateUserRequest request) {
-        UserRepresentation user = keycloak.run().realm(keycloak.getREALM()).users().search(username).get(0);
+    public void updateUser(CreateUserRequest request) {
+        UserRepresentation user = keycloak.run().realm(keycloak.getREALM()).users().search(request.getUsername()).get(0);
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setCredentials(createCredentialRepresentation(request.getPassword()));
         keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
-        log.info("User {} updated", username);
+        log.info("User {} updated", request.getUsername());
         Response response = keycloak.userResource().create(user);
         if (response.getStatus() != 204) {
             log.error("Failed to update user. Status code: {}, Response body: {}", response.getStatus(), response.readEntity(String.class));
