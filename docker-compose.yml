@@ -92,7 +92,7 @@ services:
     restart: unless-stopped
 
   keycloak:
-    image: quay.io/keycloak/keycloak:22.0.1
+    image: quay.io/keycloak/keycloak:24.0.5
     container_name: keycloak
     environment:
       KEYCLOAK_ADMIN: admin
@@ -107,7 +107,7 @@ services:
       KC_PROXY: edge
       KC_HTTP_RELATIVE_PATH: /auth
       KC_TRANSACTION_XA_ENABLED: false
-      KEYCLOAK_LOG_LEVEL: ALL
+      KC_LOG_LEVEL: DEBUG
       KC_HEALTH_ENABLED: true
     ports:
       - "8081:8080"
