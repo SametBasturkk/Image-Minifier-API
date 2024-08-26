@@ -4,6 +4,7 @@ import com.image.minifier.main.dto.CreateUserRequest;
 import com.image.minifier.main.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,13 +47,13 @@ public class UserController {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @PostMapping(value = "/login")
+    @PostMapping(value = "/login", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> login(@RequestParam("username") String username, @RequestParam("password") String password) {
         log.info("User logged in successfully : {}", userService.userLogin(username, password));
         return ResponseEntity.ok(userService.userLogin(username, password));
     }
 
-    @GetMapping(value = "/get-api-key")
+    @GetMapping(value = "/get-api-key", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> getApiKey(@RequestParam("token") String token) {
         log.info("Received request to get api key for user: {}", token);
         log.info("Api key retrieved successfully : {}", userService.getApiKey(token));
