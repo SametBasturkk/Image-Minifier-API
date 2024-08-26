@@ -4,8 +4,11 @@ import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -52,14 +55,32 @@ public class UserService {
 
     public void deleteUser(String username) {
         log.info("Attempting to delete user: {}", username);
-        UserResource userResource = keycloak.userResource().get(username);
-        UserRepresentation user = userResource.toRepresentation();
-        if (user == null || !username.equals(user.getUsername())) {
-            log.error("User {} not found", username);
-            throw new RuntimeException("User not found");
+        try {
+            UsersResource usersResource = keycloak.run().realm(keycloak.getREALM()).users();
+            List<UserRepresentation> users = usersResource.search(username, true);
+
+            if (users.isEmpty()) {
+                log.error("User {} not found", username);
+                throw new RuntimeException("User not found");
+            }
+
+            UserRepresentation user = users.get(0);
+            if (!username.equals(user.getUsername())) {
+                log.error("User {} not found", username);
+                throw new RuntimeException("User not found");
+            }
+
+            Response response = usersResource.delete(user.getId());
+            if (response.getStatus() != 204) {
+                log.error("Failed to delete user {}. Status: {}", username, response.getStatus());
+                throw new RuntimeException("Failed to delete user");
+            }
+
+            log.info("User {} deleted successfully", username);
+        } catch (Exception e) {
+            log.error("Error deleting user {}: {}", username, e.getMessage());
+            throw new RuntimeException("Error deleting user", e);
         }
-        userResource.remove();
-        log.info("User {} deleted successfully", username);
     }
 
     public void updateUser(CreateUserRequest request) {
@@ -136,18 +157,26 @@ public class UserService {
         }
     }
 
-    //TODO= FIX GETINSTANCE NOT SUPPORTING TOKEN
     public UserRepresentation getUserByToken(String token) {
         log.info("Retrieving user by token");
         try {
-            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), keycloak.getCLIENT_ID(), token);
-            List<UserRepresentation> users = keycloakClient.realm(keycloak.getREALM()).users().search(token);
-            if (users.isEmpty()) {
+            Keycloak keycloakClient = KeycloakBuilder.builder()
+                    .serverUrl(keycloak.getSERVER_URL())
+                    .realm(keycloak.getREALM())
+                    .grantType(OAuth2Constants.ACCESS_TOKEN)
+                    .clientId(keycloak.getCLIENT_ID())
+                    .authorization("Bearer " + token)
+                    .build();
+            AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
+            String userId = tokenResponse.getOtherClaims().get("sub").toString();
+            UserResource userResource = keycloakClient.realm(keycloak.getREALM()).users().get(userId);
+            UserRepresentation user = userResource.toRepresentation();
+            if (user == null) {
                 log.error("No user found for the given token");
                 return null;
             }
             log.info("User retrieved successfully by token");
-            return users.get(0);
+            return user;
         } catch (Exception e) {
             log.error("Error during getting user by token: {}", e.getMessage());
             return null;
