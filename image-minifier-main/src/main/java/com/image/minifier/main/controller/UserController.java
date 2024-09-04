@@ -3,6 +3,7 @@ package com.image.minifier.main.controller;
 import com.image.minifier.main.dto.CreateUserRequest;
 import com.image.minifier.main.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.common.VerificationException;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,14 +48,14 @@ public class UserController {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @PostMapping(value = "/login", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<String> login(@RequestParam("username") String username, @RequestParam("password") String password) {
         log.info("User logged in successfully : {}", userService.userLogin(username, password));
         return ResponseEntity.ok(userService.userLogin(username, password));
     }
 
-    @GetMapping(value = "/get-api-key", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> getApiKey(@RequestParam("token") String token) {
+    @PostMapping(value = "/get-api-key", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<String> getApiKey(@RequestParam("token") String token) throws VerificationException {
         log.info("Received request to get api key for user: {}", token);
         log.info("Api key retrieved successfully : {}", userService.getApiKey(token));
         return ResponseEntity.ok(userService.getApiKey(token));

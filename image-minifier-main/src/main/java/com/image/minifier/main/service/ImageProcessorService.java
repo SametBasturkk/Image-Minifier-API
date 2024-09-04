@@ -5,6 +5,7 @@ import com.image.minifier.main.exception.FileProcessingException;
 import com.image.minifier.main.model.ImageStatus;
 import com.image.minifier.main.producer.KafkaPublisherService;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.common.VerificationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class ImageProcessorService {
         this.userService = userService;
     }
 
-    public ResponseEntity<CompressedImageResponse> processImage(MultipartFile file, Integer quality, String apiKey, String token) {
+    public ResponseEntity<CompressedImageResponse> processImage(MultipartFile file, Integer quality, String apiKey, String token) throws VerificationException {
         userService.validateApiKey(apiKey, token);
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename().toLowerCase());
         try {

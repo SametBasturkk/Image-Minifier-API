@@ -4,11 +4,12 @@ import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.OAuth2Constants;
+import org.keycloak.TokenVerifier;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.common.VerificationException;
+import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -156,29 +157,22 @@ public class UserService {
         }
     }
 
-    public UserRepresentation getUserByToken(String token) {
+    public UserRepresentation getUserFromToken(String token) throws VerificationException {
         log.info("Retrieving user by token");
-        try {
-            Keycloak keycloakClient = KeycloakBuilder.builder().serverUrl(keycloak.getSERVER_URL()).realm(keycloak.getREALM()).grantType(OAuth2Constants.ACCESS_TOKEN).clientId(keycloak.getCLIENT_ID()).authorization("Bearer " + token).build();
-            AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
-            String userId = tokenResponse.getOtherClaims().get("sub").toString();
-            UserResource userResource = keycloakClient.realm(keycloak.getREALM()).users().get(userId);
-            UserRepresentation user = userResource.toRepresentation();
-            if (user == null) {
-                log.error("No user found for the given token");
-                return null;
-            }
+        AccessToken accessToken = TokenVerifier.create(token, AccessToken.class).getToken();
+
+        if (accessToken != null && accessToken.getPreferredUsername() != null) {
             log.info("User retrieved successfully by token");
-            return user;
-        } catch (Exception e) {
-            log.error("Error during getting user by token: {}", e.getMessage());
-            return null;
+            return getUser(accessToken.getPreferredUsername());
+        } else {
+            log.error("User not found for the given token");
+            throw new RuntimeException("User not found");
         }
     }
 
-    public String getApiKey(String token) {
+    public String getApiKey(String token) throws VerificationException {
         log.info("Retrieving API key for token");
-        UserRepresentation user = getUserByToken(token);
+        UserRepresentation user = getUserFromToken(token);
         if (user != null && user.getAttributes() != null && user.getAttributes().containsKey("api_key")) {
             log.info("API key retrieved successfully");
             return user.getAttributes().get("api_key").get(0);
@@ -205,9 +199,9 @@ public class UserService {
         }
     }
 
-    public void validateApiKey(String apiKey, String token) {
+    public void validateApiKey(String apiKey, String token) throws VerificationException {
         log.info("Validating API key");
-        UserRepresentation user = getUserByToken(token);
+        UserRepresentation user = getUserFromToken(token);
         if (user == null) {
             log.error("User not found for the given token");
             throw new RuntimeException("User not found");

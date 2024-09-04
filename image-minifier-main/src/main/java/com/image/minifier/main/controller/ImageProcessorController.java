@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.common.VerificationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +38,7 @@ public class ImageProcessorController {
     public ResponseEntity<CompressedImageResponse> uploadImage(@RequestParam("file") MultipartFile file,
                                                                @RequestParam("quality") @Min(0) @Max(100) Integer quality,
                                                                @RequestParam("api_key") String apiKey,
-                                                               @RequestHeader("Authorization") String token) {
+                                                               @RequestHeader("Authorization") String token) throws VerificationException {
         log.info("Received request to upload and compress image: {}", file.getOriginalFilename());
         return imageProcessorService.processImage(file, quality, apiKey, token);
     }
