@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +53,12 @@ public class KeycloakConfig {
     public UsersResource userResource() {
         return run().realm(REALM).users();
     }
+
+    @Bean
+    public RolesResource rolesResource() {
+        return run().realm(REALM).roles();
+    }
+
 
 
 }

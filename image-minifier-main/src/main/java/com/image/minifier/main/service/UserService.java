@@ -42,7 +42,6 @@ public class UserService {
         user.setEnabled(true);
         user.setEmailVerified(true);
         user.setAttributes(attributes);
-        user.setRealmRoles(List.of("basic"));
         Response response = keycloak.userResource().create(user);
         if (response.getStatus() == 201) {
             log.info("User {} created successfully", request.getUsername());
@@ -50,13 +49,14 @@ public class UserService {
             log.error("Failed to create user {}. Status code: {}, Response body: {}", request.getUsername(), response.getStatus(), response.readEntity(String.class));
             throw new RuntimeException("Failed to create user");
         }
+        updatePlanRole(request.getUsername(), "basic");
         response.close();
     }
 
     public void deleteUser(String username) {
         log.info("Attempting to delete user: {}", username);
         try {
-            UsersResource usersResource = keycloak.run().realm(keycloak.getREALM()).users();
+            UsersResource usersResource = keycloak.userResource();
             List<UserRepresentation> users = usersResource.search(username, true);
 
             if (users.isEmpty()) {
@@ -85,17 +85,17 @@ public class UserService {
 
     public void updateUser(CreateUserRequest request) {
         log.info("Attempting to update user: {}", request.getUsername());
-        UserRepresentation user = keycloak.run().realm(keycloak.getREALM()).users().search(request.getUsername()).get(0);
+        UserRepresentation user = keycloak.userResource().search(request.getUsername()).get(0);
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setCredentials(createCredentialRepresentation(request.getPassword()));
-        keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
+        keycloak.userResource().get(user.getId()).update(user);
 
     }
 
     public List<UserRepresentation> getUsers() {
         log.info("Retrieving all users");
-        List<UserRepresentation> listOfUsers = keycloak.run().realm(keycloak.getREALM()).users().list();
+        List<UserRepresentation> listOfUsers = keycloak.userResource().list();
         log.info("Retrieved {} users", listOfUsers.size());
         return listOfUsers;
     }
@@ -112,7 +112,7 @@ public class UserService {
 
     public UserRepresentation getUser(String username) {
         log.info("Retrieving user: {}", username);
-        List<UserRepresentation> users = keycloak.run().realm(keycloak.getREALM()).users().search(username);
+        List<UserRepresentation> users = keycloak.userResource().search(username);
         if (users.isEmpty()) {
             log.error("User {} not found", username);
             throw new RuntimeException("User not found");
@@ -127,16 +127,15 @@ public class UserService {
         HashMap<String, List<String>> attributes = new HashMap<>();
         attributes.put("api_key", List.of(UUID.randomUUID().toString()));
         user.setAttributes(attributes);
-        keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
+        keycloak.userResource().get(user.getId()).update(user);
         log.info("API key updated successfully for user {}", username);
     }
 
     public void updatePlanRole(String username, String plan) {
         log.info("Updating plan role for user: {} to plan: {}", username, plan);
-        UserRepresentation user = getUser(username);
-        user.setRealmRoles(List.of(plan));
-        keycloak.run().realm(keycloak.getREALM()).users().get(user.getId()).update(user);
-        log.info("Plan role updated successfully for user {} to {}", username, plan);
+        UserResource userResource = keycloak.userResource().get(getUser(username).getId());
+        userResource.roles().realmLevel().add(List.of(keycloak.rolesResource().get(plan).toRepresentation()));
+        log.info("Plan role updated successfully for user: {} to plan: {}", username, plan);
     }
 
     public String userLogin(String username, String password) {
@@ -160,13 +159,7 @@ public class UserService {
     public UserRepresentation getUserByToken(String token) {
         log.info("Retrieving user by token");
         try {
-            Keycloak keycloakClient = KeycloakBuilder.builder()
-                    .serverUrl(keycloak.getSERVER_URL())
-                    .realm(keycloak.getREALM())
-                    .grantType(OAuth2Constants.ACCESS_TOKEN)
-                    .clientId(keycloak.getCLIENT_ID())
-                    .authorization("Bearer " + token)
-                    .build();
+            Keycloak keycloakClient = KeycloakBuilder.builder().serverUrl(keycloak.getSERVER_URL()).realm(keycloak.getREALM()).grantType(OAuth2Constants.ACCESS_TOKEN).clientId(keycloak.getCLIENT_ID()).authorization("Bearer " + token).build();
             AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
             String userId = tokenResponse.getOtherClaims().get("sub").toString();
             UserResource userResource = keycloakClient.realm(keycloak.getREALM()).users().get(userId);
