@@ -3,7 +3,6 @@ package com.image.minifier.main.service;
 import com.image.minifier.main.dto.CompressedImageResponse;
 import com.image.minifier.main.exception.FileProcessingException;
 import com.image.minifier.main.model.ImageStatus;
-import com.image.minifier.main.model.User;
 import com.image.minifier.main.producer.KafkaPublisherService;
 import com.image.minifier.main.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -83,16 +82,11 @@ public class ImageProcessorService {
         long originalSize = file.getSize();
         long compressedSize = compressedImageData.length;
         double compressionRatio = ((double) (originalSize - compressedSize) / originalSize) * 100;
-        User user = userRepository.findByUsername(username);
 
         log.info("Original size: {}, Compressed size: {}, Compression ratio: {}%", originalSize, compressedSize, compressionRatio);
 
         CompressedImageResponse response = new CompressedImageResponse(compressedImageData, file.getOriginalFilename(), originalSize, compressedSize, compressionRatio);
-        statisticsService.updateCounterStatistic(compressedSize, originalSize);
-        user.setTotalImagesProcessed(user.getTotalImagesProcessed() + 1);
-        user.setTotalBytesProcessed(user.getTotalBytesProcessed() + originalSize);
-        user.setTotalBytesSaved(user.getTotalBytesSaved() + (originalSize - compressedSize));
-        userRepository.save(user);
+        statisticsService.updateCounterStatistic(compressedSize, originalSize, username);
 
         responseFuture.complete(ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response));
     }

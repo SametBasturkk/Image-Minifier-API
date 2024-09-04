@@ -1,6 +1,7 @@
 package com.image.minifier.main.service;
 
 import com.image.minifier.main.model.Statistics;
+import com.image.minifier.main.model.User;
 import com.image.minifier.main.repository.StatisticsRepository;
 import com.image.minifier.main.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class StatisticsService {
     }
 
 
-    public void updateCounterStatistic(Long compressedSize, Long originalSize) {
+    public void updateCounterStatistic(Long compressedSize, Long originalSize, String username) {
         lock.lock();
         try {
             Optional<Statistics> statistics = statisticsRepository.findById(1);
@@ -39,6 +40,13 @@ public class StatisticsService {
                 stats.setTotalBytesProcessed(stats.getTotalBytesProcessed() + originalSize);
                 stats.setTotalBytesSaved(stats.getTotalBytesSaved() + (originalSize - compressedSize));
                 statisticsRepository.save(stats);
+
+                User user = userRepository.findByUsername(username);
+                user.setTotalImagesProcessed(user.getTotalImagesProcessed() + 1);
+                user.setTotalBytesProcessed(user.getTotalBytesProcessed() + originalSize);
+                user.setTotalBytesSaved(user.getTotalBytesSaved() + (originalSize - compressedSize));
+                userRepository.save(user);
+
                 log.info("Statistics updated");
             } else {
                 Statistics stats = new Statistics(1, originalSize - compressedSize, originalSize);
