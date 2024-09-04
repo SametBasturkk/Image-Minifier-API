@@ -83,7 +83,7 @@ public class ImageProcessorService {
         log.info("Original size: {}, Compressed size: {}, Compression ratio: {}%", originalSize, compressedSize, compressionRatio);
 
         CompressedImageResponse response = new CompressedImageResponse(compressedImageData, file.getOriginalFilename(), originalSize, compressedSize, compressionRatio);
-        statisticsService.updateCounterStatistic(compressedSize, originalSize);
+      //  statisticsService.updateCounterStatistic(compressedSize, originalSize);
 
         responseFuture.complete(ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response));
     }

@@ -19,19 +19,19 @@ public class User {
     private long id;
     @Column(name = "username")
     private String username;
-    @Column(name = "apiKey")
-    private String apiKey;
-    @Column(name = "email")
-    private String email;
+    @Column(name = "total_images_processed")
+    private long totalImagesProcessed;
+    @Column(name = "total_bytes_saved")
+    private long totalBytesSaved;
+    @Column(name = "total_bytes_processed")
+    private long totalBytesProcessed;
     @Column(name = "created_on")
     private Date createdOn;
     @Column(name = "last_login")
     private Date lastLogin;
 
-    public User(String username, String apiKey, String email, Date createdOn, Date lastLogin) {
+    public User(String username, Date createdOn, Date lastLogin) {
         this.username = username;
-        this.apiKey = apiKey;
-        this.email = email;
         this.createdOn = createdOn;
         this.lastLogin = lastLogin;
     }
