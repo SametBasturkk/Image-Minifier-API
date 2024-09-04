@@ -44,9 +44,7 @@ public class UserService {
         Response response = keycloak.userResource().create(user);
         handleResponse(response, "User created successfully", "Failed to create user");
         updatePlanRole(request.getUsername(), "basic");
-        userRepository.save(
-                new User(request.getUsername(), 0, 0, 0, new Date())
-        );
+        userRepository.save(new User(request.getUsername(), 0, 0, 0, new Date()));
     }
 
     public void deleteUser(String username) {
@@ -99,14 +97,7 @@ public class UserService {
         }
         user.setLastLogin(new Date());
         try {
-            Keycloak keycloakClient = Keycloak.getInstance(
-                    keycloak.getSERVER_URL(),
-                    keycloak.getREALM(),
-                    username,
-                    password,
-                    keycloak.getCLIENT_ID(),
-                    keycloak.getCLIENT_SECRET()
-            );
+            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), username, password, keycloak.getCLIENT_ID(), keycloak.getCLIENT_SECRET());
             AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
             log.info("User {} logged in successfully", username);
             userRepository.save(user);
@@ -224,25 +215,26 @@ public class UserService {
         response.close();
     }
 
-    public boolean verifyToken(String token) {
+    public void verifyToken(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
             String kid = jwt.getKeyId();
             log.info("Verifying token with kid: {}", kid);
 
+            if (kid == null) {
+                log.error("Token does not contain a key id");
+                throw new RuntimeException("Token does not contain a key id");
+            }
+
             JwkProvider provider = new UrlJwkProvider(new URL(keycloak.getSERVER_URL() + "/realms/" + keycloak.getREALM() + "/protocol/openid-connect/certs"));
             Jwk jwk = provider.get(kid);
-
             log.info("JWK: {}", jwk);
-
             Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
-
-            log.info("Algorithm: {}", algorithm);
-
             algorithm.verify(jwt);
-            return true;
+            log.info("Token verified successfully");
         } catch (Exception e) {
-            return false;
+            log.error("Token verification failed: {}", e.getMessage());
+            throw new RuntimeException("Token verification failed", e);
         }
     }
 }
