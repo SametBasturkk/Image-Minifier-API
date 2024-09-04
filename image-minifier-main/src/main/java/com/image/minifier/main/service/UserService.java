@@ -184,8 +184,8 @@ public class UserService {
 
     private AccessToken parseToken(String token) {
         try {
+            keycloak.tokenVerifier(token);
             TokenVerifier<AccessToken> verifier = TokenVerifier.create(token, AccessToken.class);
-            verifier.withChecks(TokenVerifier.IS_ACTIVE);
             return verifier.getToken();
         } catch (VerificationException e) {
             log.error("Token validation failed: {}", e.getMessage());
