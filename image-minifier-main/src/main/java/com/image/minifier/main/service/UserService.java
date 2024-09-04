@@ -185,17 +185,11 @@ public class UserService {
     public void validateToken(String token) {
         log.info("Validating token");
         try {
-            Keycloak keycloakClient = Keycloak.getInstance(keycloak.getSERVER_URL(), keycloak.getREALM(), token, keycloak.getCLIENT_ID(), keycloak.getCLIENT_SECRET());
-            AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
-            if (tokenResponse != null && tokenResponse.getToken() != null) {
-                log.info("Token is valid");
-            } else {
-                log.error("Token is invalid");
-                throw new RuntimeException("Invalid token");
-            }
-        } catch (Exception e) {
-            log.error("Error during token validation: {}", e.getMessage());
-            throw new RuntimeException("Error validating token", e);
+            getUserFromToken(token);
+            log.info("Token is valid");
+        } catch (VerificationException e) {
+            log.error("Invalid token");
+            throw new RuntimeException("Invalid token");
         }
     }
 

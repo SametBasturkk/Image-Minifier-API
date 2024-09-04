@@ -38,7 +38,7 @@ public class ImageProcessorController {
     public ResponseEntity<CompressedImageResponse> uploadImage(@RequestParam("file") MultipartFile file,
                                                                @RequestParam("quality") @Min(0) @Max(100) Integer quality,
                                                                @RequestParam("api_key") String apiKey,
-                                                               @RequestHeader("Authorization") String token) throws VerificationException {
+                                                               @RequestParam("token") String token) throws VerificationException {
         log.info("Received request to upload and compress image: {}", file.getOriginalFilename());
         return imageProcessorService.processImage(file, quality, apiKey, token);
     }
