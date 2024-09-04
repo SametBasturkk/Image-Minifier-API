@@ -2,6 +2,7 @@ package com.image.minifier.main.service;
 
 import com.image.minifier.main.model.Statistics;
 import com.image.minifier.main.repository.StatisticsRepository;
+import com.image.minifier.main.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +16,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public class StatisticsService {
 
     private StatisticsRepository statisticsRepository;
+    private UserRepository userRepository;
 
     private final Lock lock = new ReentrantLock();
 
-    public StatisticsService(StatisticsRepository statisticsRepository) {
+    public StatisticsService(StatisticsRepository statisticsRepository, UserRepository userRepository) {
         this.statisticsRepository = statisticsRepository;
+        this.userRepository = userRepository;
     }
 
 

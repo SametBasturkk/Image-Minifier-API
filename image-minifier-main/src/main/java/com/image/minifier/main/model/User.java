@@ -26,13 +26,15 @@ public class User {
     @Column(name = "total_bytes_processed")
     private long totalBytesProcessed;
     @Column(name = "created_on")
-    private Date createdOn;
+    private Date createdOn = new Date();
     @Column(name = "last_login")
     private Date lastLogin;
 
-    public User(String username, Date createdOn, Date lastLogin) {
+    public User(String username, long totalImagesProcessed, long totalBytesSaved, long totalBytesProcessed, Date lastLogin) {
         this.username = username;
-        this.createdOn = createdOn;
+        this.totalImagesProcessed = totalImagesProcessed;
+        this.totalBytesSaved = totalBytesSaved;
+        this.totalBytesProcessed = totalBytesProcessed;
         this.lastLogin = lastLogin;
     }
 

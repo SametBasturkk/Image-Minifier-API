@@ -2,6 +2,8 @@ package com.image.minifier.main.service;
 
 import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
+import com.image.minifier.main.model.User;
+import com.image.minifier.main.repository.UserRepository;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.TokenVerifier;
@@ -13,19 +15,18 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
 public class UserService {
 
     private final KeycloakConfig keycloak;
+    private final UserRepository userRepository;
 
-    public UserService(KeycloakConfig keycloak) {
+    public UserService(KeycloakConfig keycloak, UserRepository userRepository) {
         this.keycloak = keycloak;
+        this.userRepository = userRepository;
     }
 
     public void createUser(CreateUserRequest request) {
@@ -34,6 +35,9 @@ public class UserService {
         Response response = keycloak.userResource().create(user);
         handleResponse(response, "User created successfully", "Failed to create user");
         updatePlanRole(request.getUsername(), "basic");
+        userRepository.save(
+                new User(request.getUsername(), 0, 0, 0, new Date())
+        );
     }
 
     public void deleteUser(String username) {
@@ -79,6 +83,8 @@ public class UserService {
 
     public String userLogin(String username, String password) {
         log.info("Attempting login for user: {}", username);
+        User user = userRepository.findByUsername(username);
+        user.setLastLogin(new Date());
         try {
             Keycloak keycloakClient = Keycloak.getInstance(
                     keycloak.getSERVER_URL(),
@@ -90,6 +96,7 @@ public class UserService {
             );
             AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
             log.info("User {} logged in successfully", username);
+            userRepository.save(user);
             return tokenResponse.getToken();
         } catch (Exception e) {
             log.error("Login failed for user {}: {}", username, e.getMessage());
@@ -121,7 +128,7 @@ public class UserService {
         }
     }
 
-    public void validateApiKey(String apiKey, String token) {
+    public String validateApiKey(String apiKey, String token) {
         log.info("Validating API key");
         UserRepresentation user = getUserFromToken(token);
         if (!apiKey.equals(getUserAttribute(user, "api_key"))) {
@@ -129,6 +136,7 @@ public class UserService {
             throw new RuntimeException("Invalid API key");
         }
         log.info("API key is valid");
+        return user.getUsername();
     }
 
     private UserRepresentation buildUserRepresentation(CreateUserRequest request) {
