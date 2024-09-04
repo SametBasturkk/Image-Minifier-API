@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.keycloak.TokenVerifier;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.common.VerificationException;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -84,6 +85,10 @@ public class UserService {
     public String userLogin(String username, String password) {
         log.info("Attempting login for user: {}", username);
         User user = userRepository.findByUsername(username);
+        if (user == null) {
+            log.error("User {} not found", username);
+            throw new RuntimeException("User not found");
+        }
         user.setLastLogin(new Date());
         try {
             Keycloak keycloakClient = Keycloak.getInstance(
@@ -179,12 +184,18 @@ public class UserService {
 
     private AccessToken parseToken(String token) {
         try {
-            return TokenVerifier.create(token, AccessToken.class).getToken();
+            TokenVerifier<AccessToken> verifier = TokenVerifier.create(token, AccessToken.class);
+            verifier.withChecks(TokenVerifier.IS_ACTIVE);
+            return verifier.getToken();
+        } catch (VerificationException e) {
+            log.error("Token validation failed: {}", e.getMessage());
+            throw new RuntimeException("Invalid token", e);
         } catch (Exception e) {
             log.error("Failed to parse token: {}", e.getMessage());
             throw new RuntimeException("Invalid token", e);
         }
     }
+
 
     private UserResource getUserResource(String username) {
         List<UserRepresentation> users = keycloak.userResource().search(username);
