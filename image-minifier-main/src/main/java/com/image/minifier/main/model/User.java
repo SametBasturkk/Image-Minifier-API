@@ -1,9 +1,6 @@
 package com.image.minifier.main.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +13,7 @@ import java.util.Date;
 public class User {
     @Id
     @Column(name = "id")
+    @GeneratedValue
     private long id;
     @Column(name = "username")
     private String username;
