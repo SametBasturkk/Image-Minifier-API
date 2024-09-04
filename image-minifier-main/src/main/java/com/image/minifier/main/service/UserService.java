@@ -228,11 +228,16 @@ public class UserService {
         try {
             DecodedJWT jwt = JWT.decode(token);
             String kid = jwt.getKeyId();
+            log.info("Verifying token with kid: {}", kid);
 
             JwkProvider provider = new UrlJwkProvider(new URL(keycloak.getSERVER_URL() + "/realms/" + keycloak.getREALM() + "/protocol/openid-connect/certs"));
             Jwk jwk = provider.get(kid);
 
+            log.info("JWK: {}", jwk);
+
             Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
+
+            log.info("Algorithm: {}", algorithm);
 
             algorithm.verify(jwt);
             return true;
