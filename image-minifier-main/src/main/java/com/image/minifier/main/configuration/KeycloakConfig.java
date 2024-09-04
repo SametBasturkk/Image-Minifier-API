@@ -1,12 +1,5 @@
 package com.image.minifier.main.configuration;
 
-import com.auth0.jwk.Jwk;
-import com.auth0.jwk.JwkException;
-import com.auth0.jwk.JwkProvider;
-import com.auth0.jwk.UrlJwkProvider;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
@@ -17,10 +10,6 @@ import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 @Slf4j
@@ -68,24 +57,6 @@ public class KeycloakConfig {
     @Bean
     public RolesResource rolesResource() {
         return run().realm(REALM).roles();
-    }
-
-    @Bean
-    public boolean tokenVerifier(String token) throws MalformedURLException, JwkException {
-        try {
-            DecodedJWT jwt = JWT.decode(token);
-            String kid = jwt.getKeyId();
-
-            JwkProvider provider = new UrlJwkProvider(new URL(SERVER_URL + "/realms/" + REALM + "/protocol/openid-connect/certs"));
-            Jwk jwk = provider.get(kid);
-
-            Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
-
-            algorithm.verify(jwt);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
 

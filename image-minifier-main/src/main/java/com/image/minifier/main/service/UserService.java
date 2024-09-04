@@ -1,5 +1,11 @@
 package com.image.minifier.main.service;
 
+import com.auth0.jwk.Jwk;
+import com.auth0.jwk.JwkProvider;
+import com.auth0.jwk.UrlJwkProvider;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.image.minifier.main.configuration.KeycloakConfig;
 import com.image.minifier.main.dto.CreateUserRequest;
 import com.image.minifier.main.model.User;
@@ -16,6 +22,8 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
+import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 
 @Service
@@ -184,7 +192,7 @@ public class UserService {
 
     private AccessToken parseToken(String token) {
         try {
-            keycloak.tokenVerifier(token);
+            verifyToken(token);
             TokenVerifier<AccessToken> verifier = TokenVerifier.create(token, AccessToken.class);
             return verifier.getToken();
         } catch (VerificationException e) {
@@ -214,5 +222,22 @@ public class UserService {
             throw new RuntimeException(errorMessage);
         }
         response.close();
+    }
+
+    public boolean verifyToken(String token) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            String kid = jwt.getKeyId();
+
+            JwkProvider provider = new UrlJwkProvider(new URL(keycloak.getSERVER_URL() + "/realms/" + keycloak.getREALM() + "/protocol/openid-connect/certs"));
+            Jwk jwk = provider.get(kid);
+
+            Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
+
+            algorithm.verify(jwt);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
