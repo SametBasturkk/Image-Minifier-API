@@ -34,7 +34,7 @@ public class ImageCompressSender {
 
         CompressImageTopicModel compressImageTopicModelResp = new CompressImageTopicModel(null, compressImageTopicModel.getQuality(), compressImageTopicModel.getExtension(), compressImageTopicModel.getUuid(), compressedBase64Data);
         kafkaTemplate.send(topicName, compressImageTopicModelResp);
-        log.info("Published message: {}", compressImageTopicModelResp);
+        log.info("Published message: {}", compressImageTopicModelResp.getUuid());
 
         cleanFiles(compressImageTopicModel.getUuid(), outputFile);
     }
