@@ -33,4 +33,9 @@ public class ImageStatusService {
         String imageStatusString = redisTemplate.opsForValue().get(uuid.toString());
         return mapper.stringToMap(imageStatusString, ImageStatus.class);
     }
+
+    public void deleteImageStatus(ImageStatus status) {
+        log.info("Deleting image status: {}", status);
+        redisTemplate.delete(status.getUuid().toString());
+    }
 }

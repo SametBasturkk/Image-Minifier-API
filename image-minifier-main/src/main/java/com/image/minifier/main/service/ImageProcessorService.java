@@ -87,6 +87,7 @@ public class ImageProcessorService {
 
         CompressedImageResponse response = new CompressedImageResponse(compressedImageData, file.getOriginalFilename(), originalSize, compressedSize, compressionRatio);
         statisticsService.updateCounterStatistic(compressedSize, originalSize, username);
+        imageStatusService.deleteImageStatus(status);
 
         responseFuture.complete(ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response));
     }
