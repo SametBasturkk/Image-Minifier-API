@@ -16,7 +16,7 @@ public class ObjectConverter {
 
     public String mapToString(Object source) {
         try {
-            log.info("Converting object to string: {}", source);
+            log.info("Converting object to string: {}", source.toString().length());
             return objectMapper.writeValueAsString(source);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -25,7 +25,7 @@ public class ObjectConverter {
 
     public <T> T stringToMap(String source, Class<T> targetType) {
         try {
-            log.info("Converting string to object: {}", source);
+            log.info("Converting string to object: {}", source.length());
             return objectMapper.readValue(source, targetType);
         } catch (Exception e) {
             throw new RuntimeException(e);
