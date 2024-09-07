@@ -1,14 +1,5 @@
 <?php
-/*
-Plugin Name: Image Compression Pro
-Plugin URI: https://yourwebsite.com/image-compression-pro
-Description: Compress images uploaded to WordPress using a custom image minify service.
-Version: 1.5
-Author: Your Name
-Author URI: https://yourwebsite.com
-*/
 
-// Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -18,7 +9,7 @@ class ImageCompressionPro {
     private $quality = 70;
     private $api_key = '4b844ad3-e38d-443c-a917-559760f1ca66';
     private $exclude_sizes = array();
-    private $token ="";
+    private $token ="eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJZV1BUck9iOVRLaC0zN3ZsY1NwbmF6VTFEYUFOc0dfWGJaU3RQQUxSSC1BIn0.eyJleHAiOjE3MjU3MDUyMTAsImlhdCI6MTcyNTcwNDkxMCwianRpIjoiYzE1MTk4NTctZjcyNy00ZTA5LWE0NjQtNTcxZWQyZjgxMGRlIiwiaXNzIjoiaHR0cDovLzE4NS4xMzYuMjA2LjE0Njo4MDgxL2F1dGgvcmVhbG1zL21pbmlmaWVyIiwic3ViIjoiOTA2ZWIzMTYtNGI0Zi00ZjMzLWExYjgtY2QwZTczNzJjMTdmIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYWRtaW4tY2xpIiwic2Vzc2lvbl9zdGF0ZSI6IjI2NmEzZjc2LTdiMDQtNGM4MC1hYjg0LTRiMjhhZTc1OTE0ZCIsImFjciI6IjEiLCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJzaWQiOiIyNjZhM2Y3Ni03YjA0LTRjODAtYWI4NC00YjI4YWU3NTkxNGQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6ImFuZyBhIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGVuZW1lMSIsImdpdmVuX25hbWUiOiJhbmciLCJmYW1pbHlfbmFtZSI6ImEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.Kr4kUDyWQjlQMjPYMz302pL1DbIsMKJktw2piOYxmTcbRo4DK7YVgmAC21slxZbhwwa37GUIRhWrj1AiyNmU6xUpDwJAt3P-4090hj5ruUUM-_nvBiOnMEC_VlHmico9a4lpJcEwV2er9Ujr4pGFpiJ0VvwFMdA3aqefnOVAMpeq0lRPDigULRnbl-gEcHGEkRREHfIn9KiyxgkkRwe3jrDbF8SPZ9QWdBOGxaWWdJEzVfGAjEMI0Oe4hd_n8_3LJQkRZv2F_ErUVCERBL8hioNowyhvlcTOoZjf3f1lZ9LqDcRRY82hxJcpcU7PkrOn2zqzspK3FVNFOsJWYi_hcg";
     private $automatic_compression = false;
     private $backup_original = false;
 
@@ -27,18 +18,12 @@ class ImageCompressionPro {
         add_action('admin_init', array($this, 'register_settings'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         add_filter('wp_handle_upload', array($this, 'compress_uploaded_image'));
-        add_action('wp_ajax_compress_existing_image', array($this, 'compress_existing_image')); // Action for Compress Existing
-        add_action('wp_ajax_nopriv_compress_existing_image', array($this, 'compress_existing_image')); // Needed for non-logged-in users
-        add_action('wp_ajax_get_compression_stats', array($this, 'get_compression_stats')); // Action for get stats
-        add_action('wp_ajax_nopriv_get_compression_stats', array($this, 'get_compression_stats'));
-        add_action('wp_ajax_get_compression_progress', array($this, 'get_compression_progress')); // Action for get progress
-        add_action('wp_ajax_nopriv_get_compression_progress', array($this, 'get_compression_progress'));
-        add_action('wp_ajax_restore_original_image', array($this, 'restore_original_image')); // Action for restore
-        add_action('wp_ajax_nopriv_restore_original_image', array($this, 'restore_original_image'));
+        add_action('wp_ajax_compress_existing_image', array($this, 'compress_existing_image'));
+        add_action('wp_ajax_get_compression_stats', array($this, 'get_compression_stats'));
+        add_action('wp_ajax_get_compression_progress', array($this, 'get_compression_progress'));
+        add_action('wp_ajax_restore_original_image', array($this, 'restore_original_image'));
         add_action('admin_notices', array($this, 'show_admin_notices'));
-        add_action('wp_ajax_bulk_compress_images', array($this, 'bulk_compress_images')); // Action for bulk compression
-        add_action('wp_ajax_nopriv_bulk_compress_images', array($this, 'bulk_compress_images')); // Needed for non-logged-in users
-
+        add_action('wp_ajax_bulk_compress_images', array($this, 'bulk_compress_images'));
 
         $this->api_key = get_option('image_compression_pro_api_key', '');
         $this->quality = get_option('image_compression_pro_quality', 70);
@@ -46,7 +31,6 @@ class ImageCompressionPro {
         $this->automatic_compression = get_option('image_compression_pro_automatic_compression', false);
         $this->backup_original = get_option('image_compression_pro_backup_original', false);
 
-        // Start background process for automatic compression
         if ($this->automatic_compression) {
             $this->start_background_compression();
         }
@@ -117,10 +101,10 @@ class ImageCompressionPro {
                         <td><input type="text" name="image_compression_pro_api_key" value="<?php echo esc_attr($this->api_key); ?>" /></td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row">Image Quality</th>
+                        <th scope="row">Compression Ratio</th>
                         <td>
                             <input type="number" name="image_compression_pro_quality" id="image_compression_pro_quality" min="1" max="100" value="<?php echo esc_attr($this->quality); ?>" />
-                            <p class="description">Enter a value between 1 and 100 to adjust image quality</span></p>
+                            <p class="description">Enter a value between 1 and 100 to adjust compression ratio</span></p>
                         </td>
                     </tr>
                     <tr valign="top">
@@ -242,28 +226,30 @@ class ImageCompressionPro {
         $attachment_id = intval($_POST['attachment_id']);
         $file_path = get_attached_file($attachment_id);
 
-        // Start progress tracking
         $this->update_compression_progress(0, $attachment_id);
 
         $compressed_image = $this->compress_image($file_path);
 
         if ($compressed_image) {
-            file_put_contents($file_path, base64_decode($compressed_image['compressedImage']));
+            $original_filename = basename($file_path);
+
+            $file_dir = dirname($file_path);
+
+            $new_file_path = path_join($file_dir, $original_filename);
+
+            file_put_contents($new_file_path, base64_decode($compressed_image['compressedImage']));
+
             $this->update_compression_stats($compressed_image);
 
-            // Finish progress tracking - update to 100% immediately
             $this->update_compression_progress(100, $attachment_id);
 
-            // Update image metadata
-            $this->update_image_metadata($file_path, $compressed_image);
+            $this->update_image_metadata($new_file_path, $compressed_image);
 
-            // Optionally create a backup
             if ($this->backup_original) {
                 $backup_path = $this->get_backup_path($attachment_id);
-                copy($file_path, $backup_path);
+                copy($new_file_path, $backup_path);
             }
 
-            // Regenerate thumbnails after compression
             $this->regenerate_thumbnails($attachment_id);
 
             wp_send_json_success($compressed_image);
@@ -362,25 +348,16 @@ class ImageCompressionPro {
         $backup_path = $this->get_backup_path($attachment_id);
         $original_path = get_attached_file($attachment_id);
 
-        // Check if the backup file exists
         if (file_exists($backup_path)) {
-            // Attempt to copy the backup file to the original image location
             if (copy($backup_path, $original_path)) {
-                // Update the attachment metadata (optional, but recommended)
-                $metadata = wp_generate_attachment_metadata( $attachment_id, $original_path );
-                wp_update_attachment_metadata( $attachment_id, $metadata );
-                // Send a success response
                 wp_send_json_success('Original image restored.');
             } else {
-                // Send an error response with a more specific message 
-                wp_send_json_error('Failed to restore original image. Please check file permissions.'); 
+                wp_send_json_error('Failed to restore original image.');
             }
         } else {
-            // Send an error response with a more specific message
-            wp_send_json_error('Backup file not found for this image.');
+            wp_send_json_error('Backup file not found.');
         }
     }
-
 
     private function get_backup_path($attachment_id) {
         $file_path = get_attached_file($attachment_id);
@@ -394,7 +371,6 @@ class ImageCompressionPro {
     public function background_compress_image($args) {
         $file_path = $args['file_path'];
 
-        // Check if the file is an image and not excluded
         $image_metadata = wp_get_attachment_metadata(attachment_url_to_postid($file_path));
         if (!$image_metadata || empty($image_metadata['file'])) {
             return;
@@ -405,32 +381,26 @@ class ImageCompressionPro {
             return;
         }
 
-        // Compress the image
         $compressed_image = $this->compress_image($file_path);
 
         if ($compressed_image) {
-            // Update image metadata
             $this->update_image_metadata($file_path, $compressed_image);
 
-            // Optionally create a backup
             if ($this->backup_original) {
                 $backup_path = $this->get_backup_path(attachment_url_to_postid($file_path));
                 copy($file_path, $backup_path);
             }
 
-            // Regenerate thumbnails after compression
             $this->regenerate_thumbnails(attachment_url_to_postid($file_path));
         }
     }
 
     private function should_exclude_image($file_size, $image_metadata) {
-        // Check if the image size is less than the exclusion limit
-        $exclude_size_limit = get_option('image_compression_pro_exclude_size_limit', 0); // In bytes
+        $exclude_size_limit = get_option('image_compression_pro_exclude_size_limit', 0);
         if ($file_size < $exclude_size_limit) {
             return true;
         }
 
-        // Check if the image size is in the excluded sizes
         foreach ($this->exclude_sizes as $size) {
             if (isset($image_metadata['sizes'][$size])) {
                 return true;
@@ -441,24 +411,20 @@ class ImageCompressionPro {
     }
 
     private function update_image_metadata($file_path, $compressed_image) {
-        // Get attachment ID from URL
         $attachment_id = attachment_url_to_postid($file_path);
         if (!$attachment_id) {
             error_log('Could not retrieve attachment ID for file: ' . $file_path);
             return;
         }
 
-        // Retrieve attachment metadata
         $image_metadata = wp_get_attachment_metadata($attachment_id);
         if (!$image_metadata) {
             error_log('Failed to retrieve metadata for attachment ID ' . $attachment_id);
             return;
         }
 
-        // Update file size in metadata
         $image_metadata['filesize'] = $compressed_image['compressedSize'];
 
-        // Update sizes metadata (if applicable)
         if (isset($image_metadata['sizes'])) {
             foreach ($image_metadata['sizes'] as $size => $data) {
                 $size_file_path = path_join(dirname($file_path), $data['file']);
@@ -470,17 +436,14 @@ class ImageCompressionPro {
             }
         }
 
-        // Update the metadata
         $update_metadata_result = wp_update_attachment_metadata($attachment_id, $image_metadata);
         if (is_wp_error($update_metadata_result)) {
             error_log('Failed to update attachment metadata for attachment ID ' . $attachment_id);
             return;
         }
 
-        // Force refresh of attachment metadata
         clean_attachment_cache($attachment_id);
 
-        // Update post modified time
         $update_post_result = wp_update_post(array(
             'ID' => $attachment_id,
             'post_modified' => current_time('mysql'),
@@ -492,13 +455,10 @@ class ImageCompressionPro {
             return;
         }
 
-        // Clear any caches
         clean_post_cache($attachment_id);
 
-        // Optional: Clear object cache (if using object caching like Redis)
         wp_cache_flush();
 
-        // Log success message
         error_log('Successfully updated metadata and post for attachment ID ' . $attachment_id);
     }
 
@@ -510,11 +470,9 @@ class ImageCompressionPro {
     }
 
     private function regenerate_thumbnails($attachment_id) {
-        // Regenerate all thumbnails for the image
         wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, get_attached_file($attachment_id)));
     }
-    
-    // Bulk Compression Function
+
     public function bulk_compress_images() {
         check_ajax_referer('image_compression_pro_nonce', 'nonce');
 
@@ -522,7 +480,6 @@ class ImageCompressionPro {
             wp_die('Unauthorized');
         }
 
-        // Get all image attachments
         $attachments = get_posts(array(
             'post_type' => 'attachment',
             'post_mime_type' => 'image',
@@ -532,13 +489,11 @@ class ImageCompressionPro {
         $totalImages = count($attachments);
         $compressedImages = 0;
 
-        // Update the bulk progress
         $this->update_bulk_compression_progress(0, $totalImages);
 
         foreach ($attachments as $attachment) {
             $file_path = get_attached_file($attachment->ID);
 
-            // Start individual image progress tracking
             $this->update_compression_progress(0, $attachment->ID);
 
             $compressed_image = $this->compress_image($file_path);
@@ -547,29 +502,23 @@ class ImageCompressionPro {
                 file_put_contents($file_path, base64_decode($compressed_image['compressedImage']));
                 $this->update_compression_stats($compressed_image);
 
-                // Finish individual image progress tracking
                 $this->update_compression_progress(100, $attachment->ID);
 
-                // Update image metadata
                 $this->update_image_metadata($file_path, $compressed_image);
 
-                // Optionally create a backup
                 if ($this->backup_original) {
                     $backup_path = $this->get_backup_path($attachment->ID);
                     copy($file_path, $backup_path);
                 }
 
-                // Regenerate thumbnails after compression
                 $this->regenerate_thumbnails($attachment->ID);
 
                 $compressedImages++;
             }
 
-            // Update the bulk progress
             $this->update_bulk_compression_progress($compressedImages, $totalImages);
         }
 
-        // After all images are processed
         $this->update_bulk_compression_progress($totalImages, $totalImages);
         $this->update_compression_stats($compressed_image);
 
@@ -580,14 +529,12 @@ class ImageCompressionPro {
     }
 
     private function update_bulk_compression_progress($completed, $total) {
-        // Update progress for bulk compression
         $progress = round(($completed / $total) * 100);
         update_option('image_compression_pro_bulk_progress', $progress);
     }
 }
 $image_compression_pro = new ImageCompressionPro();
 
-// Add CSS
 function image_compression_pro_css() {
     ?>
     <style>
@@ -627,7 +574,6 @@ function image_compression_pro_css() {
 }
 add_action('admin_head', 'image_compression_pro_css');
 
-// Add JavaScript
 function image_compression_pro_js() {
     ?>
     <script>
@@ -637,28 +583,28 @@ function image_compression_pro_js() {
             });
 
             $('#restore-image-button').on('click', function() {
-                var attachmentId = $('#image-restore-select').val();
+            var attachmentId = $('#image-restore-select').val();
 
-                $.ajax({
-                    url: image_compression_pro.ajax_url,
-                    type: 'POST',
-                    data: {
-                        action: 'restore_original_image',
-                        nonce: image_compression_pro.nonce,
-                        attachment_id: attachmentId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#restore-result').html('<p>' + response.data + '</p>');
-                        } else {
-                            $('#restore-result').html('<p>' + response.data + '</p>');
-                        }
-                    },
-                    error: function() {
-                        $('#restore-result').html('<p>An error occurred. Please try again later.</p>');
+            $.ajax({
+                url: image_compression_pro.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'restore_original_image',
+                    nonce: image_compression_pro.nonce,
+                    attachment_id: attachmentId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#restore-result').html('<p>' + response.data + '</p>');
+                    } else {
+                        $('#restore-result').html('<p>' + response.data + '</p>');
                     }
-                });
+                },
+                error: function() {
+                    $('#restore-result').html('<p>An error occurred. Please try again later.</p>');
+                }
             });
+        });
 
             function loadCompressionStats() {
                 $.ajax({
@@ -756,11 +702,11 @@ function image_compression_pro_js() {
                     complete: function() {
                         // Clear the interval when bulk compression is complete
                         clearInterval(bulkProgressInterval);
-                        $('#bulk-compression-progress').html(''); 
+                        $('#bulk-compression-progress').html('');
                     }
                 });
             });
-            
+
 
             // Update Bulk Progress (this function remains the same)
             function updateBulkProgress() {
@@ -789,4 +735,3 @@ add_action('admin_footer', 'image_compression_pro_js');
 
 // Add background process function
 add_action('image_compression_pro_compress_image', array($image_compression_pro, 'background_compress_image'));
-
