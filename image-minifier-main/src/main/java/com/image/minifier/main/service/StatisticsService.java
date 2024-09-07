@@ -46,7 +46,9 @@ public class StatisticsService {
                 if (user == null) {
                     log.error("User not found creating entry");
                     userRepository.save(new User(username, 0, 0, 0, new Date()));
+                    user = userRepository.findByUsername(username);
                 }
+
                 user.setTotalImagesProcessed(user.getTotalImagesProcessed() + 1);
                 user.setTotalBytesProcessed(user.getTotalBytesProcessed() + originalSize);
                 user.setTotalBytesSaved(user.getTotalBytesSaved() + (originalSize - compressedSize));
