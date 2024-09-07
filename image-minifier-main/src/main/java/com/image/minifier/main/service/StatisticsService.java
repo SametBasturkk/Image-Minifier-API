@@ -7,6 +7,7 @@ import com.image.minifier.main.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -42,6 +43,10 @@ public class StatisticsService {
                 statisticsRepository.save(stats);
 
                 User user = userRepository.findByUsername(username);
+                if (user == null) {
+                    log.error("User not found creating entry");
+                    userRepository.save(new User(username, 0, 0, 0, new Date()));
+                }
                 user.setTotalImagesProcessed(user.getTotalImagesProcessed() + 1);
                 user.setTotalBytesProcessed(user.getTotalBytesProcessed() + originalSize);
                 user.setTotalBytesSaved(user.getTotalBytesSaved() + (originalSize - compressedSize));
