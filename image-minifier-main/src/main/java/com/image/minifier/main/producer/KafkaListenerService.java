@@ -31,7 +31,7 @@ public class KafkaListenerService {
         ImageStatus imageStatus = imageStatusService.getImageStatusByUuid(message.getUuid());
         imageStatus.setCompressedBase64Data(message.getCompressedBase64Data());
         imageStatus.setCompressed(true);
-        log.info("Consumed message: {}", message);
+        log.info("Consumed message: {}", message.getUuid());
         imageStatusService.saveImageStatus(imageStatus);
     }
 }
